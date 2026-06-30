@@ -1,0 +1,7 @@
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+scipy>=1.10
+# scipy powers the z-score based gap score in src/join_logic.py.
+# An LLM client is intentionally NOT pinned yet: the agentic correlation layer
+# (LLM candidate generation + LLM-assisted verification) is Checkpoint 3 scope.

@@ -1,2 +1,16 @@
+# OS / editor cruft
 .DS_Store
 *.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# NOTE: data/output/ is intentionally NOT ignored.
+# The generated profiler_log.json and joined_county_panel.csv are committed to
+# main as self-contained Supporting Evidence that the pipeline runs end-to-end
+# (per Checkpoint 1 grading feedback).

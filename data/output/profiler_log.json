@@ -1,0 +1,501 @@
+{
+  "tables": {
+    "ngos": {
+      "rows": 1048575,
+      "columns": [
+        "ein",
+        "name",
+        "fulladdr",
+        "city",
+        "state",
+        "zip",
+        "county",
+        "ntee_code",
+        "category",
+        "is_category_llm_generated"
+      ],
+      "dtypes": {
+        "ein": "string",
+        "name": "object",
+        "fulladdr": "object",
+        "city": "object",
+        "state": "object",
+        "zip": "float64",
+        "county": "object",
+        "ntee_code": "object",
+        "category": "object",
+        "is_category_llm_generated": "float64"
+      },
+      "null_pct": {
+        "ein": 0.0,
+        "name": 0.0,
+        "fulladdr": 0.0,
+        "city": 0.0,
+        "state": 0.0,
+        "zip": 0.0,
+        "county": 0.0,
+        "ntee_code": 0.0068,
+        "category": 0.0,
+        "is_category_llm_generated": 1.0
+      },
+      "key_cols": [
+        "ein",
+        "county",
+        "state"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    },
+    "f9": {
+      "rows": 131587,
+      "columns": [
+        "objectid",
+        "url",
+        "return_version",
+        "org_ein",
+        "org_name_l1",
+        "org_name_l2",
+        "return_type",
+        "tax_year",
+        "f9_01_act_gvrn_act_mission",
+        "f9_01_act_gvrn_termin_kontr_x",
+        "f9_01_act_gvrn_num_vote_memb",
+        "f9_01_act_gvrn_num_vote_memb_ind",
+        "f9_01_act_gvrn_empl_tot",
+        "f9_01_act_gvrn_vol_tot",
+        "f9_01_act_gvrn_ubiz_rev_tot",
+        "f9_01_act_gvrn_ubiz_taxable_net",
+        "f9_01_rev_contr_tot_cy",
+        "f9_01_rev_contr_tot_cy_2",
+        "f9_01_rev_contr_tot_py",
+        "f9_01_rev_prog_tot_cy",
+        "f9_01_rev_prog_tot_py",
+        "f9_01_rev_invest_tot_cy",
+        "f9_01_rev_invest_tot_py",
+        "f9_01_rev_oth_cy",
+        "f9_01_rev_oth_py",
+        "f9_01_rev_tot_cy",
+        "f9_01_rev_tot_py",
+        "f9_01_exp_grant_similar_cy",
+        "f9_01_exp_grant_similar_py",
+        "f9_01_exp_ben_paid_memb_cy",
+        "f9_01_exp_ben_paid_memb_py",
+        "f9_01_exp_sal_etc_cy",
+        "f9_01_exp_sal_etc_py",
+        "f9_01_exp_prof_fundr_tot_cy",
+        "f9_01_exp_prof_fundr_tot_py",
+        "f9_01_exp_fundr_tot_cy",
+        "f9_01_exp_oth_cy",
+        "f9_01_exp_oth_cy_v2",
+        "f9_01_exp_oth_py",
+        "f9_01_exp_tot_cy",
+        "f9_01_exp_tot_py",
+        "f9_01_exp_rev_less_exp_cy",
+        "f9_01_exp_rev_less_exp_py",
+        "f9_01_nafb_asset_tot_boy",
+        "f9_01_nafb_asset_tot_eoy",
+        "f9_01_nafb_liab_tot_boy",
+        "f9_01_nafb_liab_tot_eoy",
+        "f9_01_nafb_tot_boy",
+        "f9_01_nafb_tot_eoy"
+      ],
+      "dtypes": {
+        "objectid": "object",
+        "url": "object",
+        "return_version": "object",
+        "org_ein": "string",
+        "org_name_l1": "object",
+        "org_name_l2": "object",
+        "return_type": "object",
+        "tax_year": "float64",
+        "f9_01_act_gvrn_act_mission": "object",
+        "f9_01_act_gvrn_termin_kontr_x": "object",
+        "f9_01_act_gvrn_num_vote_memb": "float64",
+        "f9_01_act_gvrn_num_vote_memb_ind": "float64",
+        "f9_01_act_gvrn_empl_tot": "float64",
+        "f9_01_act_gvrn_vol_tot": "float64",
+        "f9_01_act_gvrn_ubiz_rev_tot": "float64",
+        "f9_01_act_gvrn_ubiz_taxable_net": "float64",
+        "f9_01_rev_contr_tot_cy": "float64",
+        "f9_01_rev_contr_tot_cy_2": "float64",
+        "f9_01_rev_contr_tot_py": "float64",
+        "f9_01_rev_prog_tot_cy": "float64",
+        "f9_01_rev_prog_tot_py": "float64",
+        "f9_01_rev_invest_tot_cy": "float64",
+        "f9_01_rev_invest_tot_py": "float64",
+        "f9_01_rev_oth_cy": "float64",
+        "f9_01_rev_oth_py": "float64",
+        "f9_01_rev_tot_cy": "float64",
+        "f9_01_rev_tot_py": "float64",
+        "f9_01_exp_grant_similar_cy": "float64",
+        "f9_01_exp_grant_similar_py": "float64",
+        "f9_01_exp_ben_paid_memb_cy": "float64",
+        "f9_01_exp_ben_paid_memb_py": "float64",
+        "f9_01_exp_sal_etc_cy": "float64",
+        "f9_01_exp_sal_etc_py": "float64",
+        "f9_01_exp_prof_fundr_tot_cy": "float64",
+        "f9_01_exp_prof_fundr_tot_py": "float64",
+        "f9_01_exp_fundr_tot_cy": "float64",
+        "f9_01_exp_oth_cy": "float64",
+        "f9_01_exp_oth_cy_v2": "float64",
+        "f9_01_exp_oth_py": "float64",
+        "f9_01_exp_tot_cy": "float64",
+        "f9_01_exp_tot_py": "float64",
+        "f9_01_exp_rev_less_exp_cy": "float64",
+        "f9_01_exp_rev_less_exp_py": "float64",
+        "f9_01_nafb_asset_tot_boy": "float64",
+        "f9_01_nafb_asset_tot_eoy": "float64",
+        "f9_01_nafb_liab_tot_boy": "float64",
+        "f9_01_nafb_liab_tot_eoy": "float64",
+        "f9_01_nafb_tot_boy": "float64",
+        "f9_01_nafb_tot_eoy": "float64"
+      },
+      "null_pct": {
+        "objectid": 0.0,
+        "url": 0.0,
+        "return_version": 0.0,
+        "org_ein": 0.0,
+        "org_name_l1": 0.0,
+        "org_name_l2": 0.8723,
+        "return_type": 0.0,
+        "tax_year": 0.0,
+        "f9_01_act_gvrn_act_mission": 0.5555,
+        "f9_01_act_gvrn_termin_kontr_x": 0.9951,
+        "f9_01_act_gvrn_num_vote_memb": 0.5553,
+        "f9_01_act_gvrn_num_vote_memb_ind": 0.5553,
+        "f9_01_act_gvrn_empl_tot": 0.5553,
+        "f9_01_act_gvrn_vol_tot": 0.7223,
+        "f9_01_act_gvrn_ubiz_rev_tot": 0.5553,
+        "f9_01_act_gvrn_ubiz_taxable_net": 0.7536,
+        "f9_01_rev_contr_tot_cy": 0.5553,
+        "f9_01_rev_contr_tot_cy_2": 0.5441,
+        "f9_01_rev_contr_tot_py": 0.6449,
+        "f9_01_rev_prog_tot_cy": 0.2737,
+        "f9_01_rev_prog_tot_py": 0.7164,
+        "f9_01_rev_invest_tot_cy": 0.5553,
+        "f9_01_rev_invest_tot_py": 0.6811,
+        "f9_01_rev_oth_cy": 0.5553,
+        "f9_01_rev_oth_py": 0.7317,
+        "f9_01_rev_tot_cy": 0.0142,
+        "f9_01_rev_tot_py": 0.5842,
+        "f9_01_exp_grant_similar_cy": 0.3548,
+        "f9_01_exp_grant_similar_py": 0.7954,
+        "f9_01_exp_ben_paid_memb_cy": 0.4193,
+        "f9_01_exp_ben_paid_memb_py": 0.8493,
+        "f9_01_exp_sal_etc_cy": 0.3322,
+        "f9_01_exp_sal_etc_py": 0.7039,
+        "f9_01_exp_prof_fundr_tot_cy": 0.5553,
+        "f9_01_exp_prof_fundr_tot_py": 0.8557,
+        "f9_01_exp_fundr_tot_cy": 0.5553,
+        "f9_01_exp_oth_cy": 0.5553,
+        "f9_01_exp_oth_cy_v2": 0.4969,
+        "f9_01_exp_oth_py": 0.5898,
+        "f9_01_exp_tot_cy": 0.0189,
+        "f9_01_exp_tot_py": 0.5856,
+        "f9_01_exp_rev_less_exp_cy": 0.0185,
+        "f9_01_exp_rev_less_exp_py": 0.5839,
+        "f9_01_nafb_asset_tot_boy": 0.5715,
+        "f9_01_nafb_asset_tot_eoy": 0.5553,
+        "f9_01_nafb_liab_tot_boy": 0.6894,
+        "f9_01_nafb_liab_tot_eoy": 0.5553,
+        "f9_01_nafb_tot_boy": 0.0564,
+        "f9_01_nafb_tot_eoy": 0.017
+      },
+      "key_cols": [
+        "org_ein"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    },
+    "disadvantaged": {
+      "rows": 72742,
+      "columns": [
+        "id",
+        "geoid",
+        "city",
+        "county_name",
+        "county_fips",
+        "state_code",
+        "state_fips",
+        "state",
+        "dac_status",
+        "population",
+        "lowincome_ami_pct",
+        "avg_energy_burden",
+        "grid_outages_county",
+        "grid_outage_duration",
+        "renters_pct",
+        "single_parent_pct",
+        "no_internet_pct",
+        "lowincome_fpl_pct",
+        "avg_housing_burden",
+        "food_desert_pct",
+        "dac_score",
+        "avg_energy_burden_natl_pctile"
+      ],
+      "dtypes": {
+        "id": "int64",
+        "geoid": "string",
+        "city": "object",
+        "county_name": "object",
+        "county_fips": "string",
+        "state_code": "object",
+        "state_fips": "string",
+        "state": "object",
+        "dac_status": "bool",
+        "population": "int64",
+        "lowincome_ami_pct": "float64",
+        "avg_energy_burden": "int64",
+        "grid_outages_county": "int64",
+        "grid_outage_duration": "int64",
+        "renters_pct": "float64",
+        "single_parent_pct": "float64",
+        "no_internet_pct": "float64",
+        "lowincome_fpl_pct": "float64",
+        "avg_housing_burden": "float64",
+        "food_desert_pct": "float64",
+        "dac_score": "float64",
+        "avg_energy_burden_natl_pctile": "float64"
+      },
+      "null_pct": {
+        "id": 0.0,
+        "geoid": 0.0,
+        "city": 0.0906,
+        "county_name": 0.0,
+        "county_fips": 0.0,
+        "state_code": 0.0,
+        "state_fips": 0.0,
+        "state": 0.0,
+        "dac_status": 0.0,
+        "population": 0.0,
+        "lowincome_ami_pct": 0.0088,
+        "avg_energy_burden": 0.0,
+        "grid_outages_county": 0.0,
+        "grid_outage_duration": 0.0,
+        "renters_pct": 0.0,
+        "single_parent_pct": 0.0,
+        "no_internet_pct": 0.0,
+        "lowincome_fpl_pct": 0.0,
+        "avg_housing_burden": 0.0,
+        "food_desert_pct": 0.0041,
+        "dac_score": 0.0,
+        "avg_energy_burden_natl_pctile": 0.0
+      },
+      "key_cols": [
+        "county_fips"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    },
+    "county_lookup": {
+      "rows": 3076,
+      "columns": [
+        "county_fips",
+        "county_name",
+        "state"
+      ],
+      "dtypes": {
+        "county_fips": "string",
+        "county_name": "object",
+        "state": "object"
+      },
+      "null_pct": {
+        "county_fips": 0.0,
+        "county_name": 0.0,
+        "state": 0.0
+      },
+      "key_cols": [
+        "county_fips",
+        "county_name",
+        "state"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    },
+    "poverty": {
+      "rows": 2998,
+      "columns": [
+        "fips_code",
+        "area_name",
+        "poverty_percentage"
+      ],
+      "dtypes": {
+        "fips_code": "string",
+        "area_name": "object",
+        "poverty_percentage": "float64"
+      },
+      "null_pct": {
+        "fips_code": 0.0,
+        "area_name": 0.0,
+        "poverty_percentage": 0.0
+      },
+      "key_cols": [
+        "fips_code"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    },
+    "nccs": {
+      "rows": 3142,
+      "columns": [
+        "geoid_2010",
+        "year",
+        "med_family_income_adj",
+        "med_gross_rent_adj",
+        "med_household_income_adj",
+        "poverty_perc",
+        "unemployment"
+      ],
+      "dtypes": {
+        "geoid_2010": "string",
+        "year": "object",
+        "med_family_income_adj": "float64",
+        "med_gross_rent_adj": "float64",
+        "med_household_income_adj": "float64",
+        "poverty_perc": "float64",
+        "unemployment": "float64"
+      },
+      "null_pct": {
+        "geoid_2010": 0.0,
+        "year": 0.0,
+        "med_family_income_adj": 0.0,
+        "med_gross_rent_adj": 0.0013,
+        "med_household_income_adj": 0.0,
+        "poverty_perc": 0.0,
+        "unemployment": 0.0
+      },
+      "key_cols": [
+        "geoid_2010"
+      ],
+      "key_completeness": 1.0,
+      "verdict": "usable"
+    }
+  },
+  "joins": [
+    {
+      "name": "ngo_county_to_fips",
+      "side": "capacity",
+      "match_rate": 0.9462,
+      "matched": 992202,
+      "unmatched": 56373,
+      "verdict": "usable",
+      "detail": {
+        "total_rows": 1048575,
+        "matched_rows": 992202,
+        "unmatched_rows": 56373,
+        "match_rate": 0.9462,
+        "top_unmatched_states": {
+          "FL": 38915,
+          "CT": 11352,
+          "VA": 5291,
+          "NM": 300,
+          "CA": 82,
+          "OH": 69,
+          "NY": 44,
+          "IL": 26,
+          "NJ": 22,
+          "ME": 19
+        }
+      }
+    },
+    {
+      "name": "dac_to_poverty",
+      "side": "need",
+      "match_rate": 0.9542,
+      "matched": 2998,
+      "unmatched": 144,
+      "verdict": "usable",
+      "detail": {
+        "dac_counties": 3142,
+        "other_counties": 2998
+      }
+    },
+    {
+      "name": "dac_to_nccs",
+      "side": "need",
+      "match_rate": 0.9994,
+      "matched": 3140,
+      "unmatched": 2,
+      "verdict": "usable",
+      "detail": {
+        "dac_counties": 3142,
+        "other_counties": 3142
+      }
+    }
+  ],
+  "gate": {
+    "verdict": "proceed_with_warning",
+    "reasons": [
+      "capacity-side join 'ngo_county_to_fips' match_rate=0.9462 (usable) -> auto-drop unmatched (56373 rows); top states: {'FL': 38915, 'CT': 11352, 'VA': 5291, 'NM': 300, 'CA': 82, 'OH': 69, 'NY': 44, 'IL': 26, 'NJ': 22, 'ME': 19}"
+    ]
+  },
+  "panel": {
+    "summary": {
+      "capacity_counties": 3029,
+      "need_counties": 3142,
+      "joined_counties": 3027,
+      "capacity_only": 2,
+      "need_only": 115
+    },
+    "stats": {
+      "need_score": {
+        "mean": 0.0038,
+        "median": -0.0227,
+        "std": 0.5975
+      },
+      "capacity_score": {
+        "mean": -0.0,
+        "median": -0.2402,
+        "std": 0.7751
+      },
+      "gap_score": {
+        "mean": 0.0038,
+        "median": 0.1185,
+        "std": 1.0481
+      }
+    },
+    "top_gap_counties": [
+      {
+        "county_fips": "05077",
+        "gap_score": 3.4507313390252032
+      },
+      {
+        "county_fips": "22023",
+        "gap_score": 2.7677191874037526
+      },
+      {
+        "county_fips": "48505",
+        "gap_score": 2.7625282528097945
+      },
+      {
+        "county_fips": "28151",
+        "gap_score": 2.682650039010682
+      },
+      {
+        "county_fips": "46137",
+        "gap_score": 2.65002249217891
+      },
+      {
+        "county_fips": "22119",
+        "gap_score": 2.6239702462890744
+      },
+      {
+        "county_fips": "28011",
+        "gap_score": 2.5882709818010303
+      },
+      {
+        "county_fips": "28157",
+        "gap_score": 2.5456267812756654
+      },
+      {
+        "county_fips": "01011",
+        "gap_score": 2.4248465258631953
+      },
+      {
+        "county_fips": "01105",
+        "gap_score": 2.4209421416466017
+      }
+    ],
+    "rows": 3027
+  }
+}
