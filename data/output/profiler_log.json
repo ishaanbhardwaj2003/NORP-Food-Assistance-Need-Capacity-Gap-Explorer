@@ -445,55 +445,55 @@
       },
       "capacity_score": {
         "mean": -0.0,
-        "median": -0.2402,
-        "std": 0.7751
+        "median": -0.1241,
+        "std": 0.8331
       },
       "gap_score": {
         "mean": 0.0038,
-        "median": 0.1185,
-        "std": 1.0481
+        "median": 0.0992,
+        "std": 1.1036
       }
     },
     "top_gap_counties": [
       {
         "county_fips": "05077",
-        "gap_score": 3.4507313390252032
-      },
-      {
-        "county_fips": "22023",
-        "gap_score": 2.7677191874037526
+        "gap_score": 4.423310469617162
       },
       {
         "county_fips": "48505",
-        "gap_score": 2.7625282528097945
+        "gap_score": 3.769181045552649
       },
       {
-        "county_fips": "28151",
-        "gap_score": 2.682650039010682
+        "county_fips": "48507",
+        "gap_score": 3.3180353198754666
       },
       {
-        "county_fips": "46137",
-        "gap_score": 2.65002249217891
+        "county_fips": "22023",
+        "gap_score": 3.303670150584465
       },
       {
         "county_fips": "22119",
-        "gap_score": 2.6239702462890744
+        "gap_score": 3.271004104712155
       },
       {
         "county_fips": "28011",
-        "gap_score": 2.5882709818010303
+        "gap_score": 3.170514307829964
       },
       {
-        "county_fips": "28157",
-        "gap_score": 2.5456267812756654
+        "county_fips": "46137",
+        "gap_score": 3.1642214369820527
       },
       {
-        "county_fips": "01011",
-        "gap_score": 2.4248465258631953
+        "county_fips": "28163",
+        "gap_score": 3.014048592560443
       },
       {
         "county_fips": "01105",
-        "gap_score": 2.4209421416466017
+        "gap_score": 2.9786223701360792
+      },
+      {
+        "county_fips": "21051",
+        "gap_score": 2.957339276763001
       }
     ],
     "rows": 3027

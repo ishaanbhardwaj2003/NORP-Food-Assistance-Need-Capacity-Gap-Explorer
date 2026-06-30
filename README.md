@@ -73,8 +73,10 @@ load_data → profile_data (+ gate) → [gate check] → build_capacity_table
 ```
 
 `gap_score = need_score − capacity_score`, where each score is the mean of the
-available indicators' z-scores. A high gap is a **triage signal** ("worth
-investigating"), not a causal claim about nonprofit effectiveness.
+available indicators' z-scores. Need indicators (bounded percentages) are scored
+linearly; the per-capita capacity indicators are signed-log transformed first so
+a few financial outliers can't dominate. A high gap is a **triage signal**
+("worth investigating"), not a causal claim about nonprofit effectiveness.
 
 ## Layout
 

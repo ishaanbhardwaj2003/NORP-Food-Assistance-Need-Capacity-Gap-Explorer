@@ -26,6 +26,16 @@ NEED_INDICATORS = ["poverty_rate", "avg_food_desert_pct", "avg_housing_burden"]
 CAPACITY_INDICATORS = ["ngo_per_10k", "revenue_per_capita", "assets_per_capita"]
 
 
+def _signed_log(s: pd.Series) -> pd.Series:
+    """sign(x)*log1p(|x|): compress the heavy right tail of the per-capita
+    capacity metrics while preserving negative net assets. Without this, a few
+    counties hosting a single huge nonprofit (asset-per-capita skew > 20) produce
+    z-scores near 38 and dominate the gap score; the signed log makes the score
+    robust without changing its meaning."""
+    s = pd.to_numeric(s, errors="coerce")
+    return np.sign(s) * np.log1p(np.abs(s))
+
+
 def _zmean(df: pd.DataFrame, cols: list[str]) -> pd.Series:
     """Row-wise mean of per-column z-scores, ignoring NaN/constant columns."""
     cols = [c for c in cols if c in df.columns]
@@ -50,10 +60,20 @@ def score_panel(panel: pd.DataFrame) -> pd.DataFrame:
     df["revenue_per_capita"] = pd.to_numeric(df.get("total_revenue"), errors="coerce") / pop
     df["assets_per_capita"] = pd.to_numeric(df.get("total_assets"), errors="coerce") / pop
 
+    # Raw per-capita columns are kept in the output for interpretability, but the
+    # capacity score is computed on their signed-log transform so a few financial
+    # outliers can't dominate (see _signed_log). Need indicators are bounded
+    # percentages with low skew, so they are scored linearly.
+    log_cols = []
+    for c in CAPACITY_INDICATORS:
+        lc = f"_log_{c}"
+        df[lc] = _signed_log(df[c])
+        log_cols.append(lc)
+
     df["need_score"] = _zmean(df, NEED_INDICATORS)
-    df["capacity_score"] = _zmean(df, CAPACITY_INDICATORS)
+    df["capacity_score"] = _zmean(df, log_cols)
     df["gap_score"] = df["need_score"] - df["capacity_score"]
-    return df
+    return df.drop(columns=log_cols)
 
 
 class PanelBuilder:
