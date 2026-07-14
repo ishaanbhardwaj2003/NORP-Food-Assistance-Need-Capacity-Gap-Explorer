@@ -7,17 +7,27 @@ the data automatically, and computes an explainable **gap score** per U.S.
 county.
 
 The unit of analysis is the **county** (joined on 5-digit FIPS). Python is the
-source of truth for all statistics. An LLM layer (correlation-candidate
-generation + summarization) is planned as a later phase; the pipeline in this
-repository is fully deterministic.
+source of truth for all statistics. The LLM layer (correlation-candidate
+generation, advisory gate review, and narrative framing) sits on top of the
+deterministic pipeline and is fully reproducible offline via a committed
+response cache.
 
 ## Where the agent acts
 
-The profiler classifies each table/join as `usable` / `usable_with_warning` /
-`drop` and the pipeline **acts on that classification without manual
-intervention** — auto-dropping a state from a join when its match rate is too
-low, then logging why, and emitting an overall
-`proceed / proceed_with_warning / stop` verdict that gates downstream steps.
+1. **Data-quality triage + gate (rule-based, authoritative).** The profiler
+   classifies each table/join as `usable` / `usable_with_warning` / `drop` and
+   the pipeline **acts on that classification without manual intervention** —
+   auto-dropping a state from a join when its match rate is too low, then
+   logging why, and emitting an overall
+   `proceed / proceed_with_warning / stop` verdict that gates downstream steps.
+2. **Correlation-candidate generation (LLM, advisory).** The agent sees only
+   the panel *schema* (column names + summary stats, never raw rows) and
+   proposes need-vs-capacity pairs with hypotheses and expected signs. Python
+   then computes Pearson + Spearman for the **exhaustive** need × capacity
+   grid, so the LLM prioritizes but can never invent or skew a statistic.
+3. **Gate review (LLM, advisory).** The agent issues a second opinion on the
+   rule-based gate verdict. Disagreement is logged, never acted on — the
+   rule-based verdict stays authoritative.
 
 > [!IMPORTANT]
 > **No manual geographic patching.** Florida is absent from `county_fips_lookup`
@@ -55,21 +65,32 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-# Full pipeline → data/output/joined_county_panel.csv + profiler_log.json
+# 1) Full pipeline → data/output/joined_county_panel.csv + profiler_log.json
 python scripts/run_pipeline.py --verbose
 
-# Fast iteration: 10k rows/file, synthetic capacity/need tables
+# 2) Checkpoint 3 analysis → correlations, figures, findings summary
+#    (offline by default: replays the committed LLM cache, no API key needed)
+python scripts/run_analysis.py
+
+# Optional: refresh the LLM artifact through the Anthropic API
+ANTHROPIC_API_KEY=... python scripts/run_analysis.py --live
+
+# Fast pipeline iteration: 10k rows/file, synthetic capacity/need tables
 python scripts/run_pipeline.py --sample --mock --verbose
 ```
 
-Flags: `--sample` (10k rows/file), `--mock` (synthetic capacity/need tables to
-exercise the pipeline without the full aggregation), `--verbose`.
+`run_pipeline.py` flags: `--sample` (10k rows/file), `--mock` (synthetic
+capacity/need tables), `--verbose`. `run_analysis.py` flags: `--live` (call the
+Anthropic API and rewrite `data/output/llm_candidates.json`), `--model`
+(default `claude-opus-4-8`), `--skip-plots`.
 
 ## Pipeline stages
 
 ```
 load_data → profile_data (+ gate) → [gate check] → build_capacity_table
           → build_need_table → join_logic (inner join + gap score) → output/
+          → correlation_agent (LLM candidates + Python-computed grid)
+          → make_plots (figures) → findings_summary.md
 ```
 
 `gap_score = need_score − capacity_score`, where each score is the mean of the
@@ -88,17 +109,28 @@ src/
   build_capacity_table.py # NGO + F9 → county capacity metrics
   build_need_table.py     # DAC + poverty + NCCS → county need metrics
   join_logic.py           # county panel inner join + gap score
+  correlation_agent.py    # LLM candidate proposals + exhaustive Python correlations
+  make_plots.py           # top-gap / scatter / distribution / heatmap figures
 scripts/
-  run_pipeline.py         # end-to-end orchestration
+  run_pipeline.py         # pipeline orchestration (Checkpoint 2)
+  run_analysis.py         # analysis orchestration (Checkpoint 3)
 data/
   raw/                    # committed inputs
-  output/                 # generated: joined_county_panel.csv, profiler_log.json
+  output/                 # generated evidence (committed, see below)
 ```
 
 ## Output
 
-`data/output/joined_county_panel.csv` — one row per county with capacity
-metrics, need metrics, and `need_score` / `capacity_score` / `gap_score`.
+All committed to `data/output/` as self-contained evidence:
 
-`data/output/profiler_log.json` — per-table schema and null audit, per-join
-match rates, and the overall gate verdict with reasons.
+- `joined_county_panel.csv` — one row per county with capacity metrics, need
+  metrics, and `need_score` / `capacity_score` / `gap_score`.
+- `profiler_log.json` — per-table schema and null audit, per-join match rates,
+  and the overall gate verdict with reasons.
+- `correlation_results.csv` — the exhaustive need × capacity Pearson/Spearman
+  grid, annotated with the LLM's proposed pairs and sign checks.
+- `llm_candidates.json` — the cached LLM artifact (schema context, candidate
+  hypotheses, advisory gate review); replayed by offline runs.
+- `figures/` — the four Checkpoint 3 figures.
+- `findings_summary.md` — the generated findings summary (Python-computed
+  numbers, LLM framing).

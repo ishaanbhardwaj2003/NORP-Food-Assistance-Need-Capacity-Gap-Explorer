@@ -3,6 +3,47 @@
 All notable changes to the NORP Food Assistance Need-Capacity Gap Explorer.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## Checkpoint 3 — 2026-07-14
+
+The LLM-assisted analysis layer on top of the deterministic Checkpoint 2 panel:
+correlation agent, figures, and a findings summary. Python remains the source
+of truth for every statistic; the LLM only proposes candidates, reviews the
+gate, and frames the narrative.
+
+### Added
+- **`src/correlation_agent.py`** — the Checkpoint 3 agent. Builds a schema-only
+  context (column names + summary stats, never raw rows), asks the LLM for 5–8
+  candidate need-vs-capacity pairs with hypotheses/expected signs plus an
+  **advisory gate review**, and hard-validates the response (unknown columns are
+  dropped). Python then computes Pearson + Spearman for the **exhaustive
+  need × capacity grid** and checks each LLM hypothesis against the measured sign.
+- **Reproducible LLM caching** — every LLM response is cached to
+  `data/output/llm_candidates.json` (committed). The default offline mode
+  replays the cache byte-for-byte so the whole analysis reruns **without an API
+  key**; `--live` regenerates it through the Anthropic API.
+- **`src/make_plots.py`** — four figures in `data/output/figures/`:
+  `top_gap_counties.png`, `need_vs_capacity.png`, `gap_distribution.png`,
+  `correlation_heatmap.png` (headless matplotlib, committed as evidence).
+- **`scripts/run_analysis.py`** — Checkpoint 3 orchestration
+  (`--live`, `--model`, `--skip-plots`): panel → correlation grid → LLM
+  candidates → evaluation → figures → findings summary.
+- **`data/output/correlation_results.csv`** — the authoritative 28-pair grid
+  annotated with which pairs the LLM proposed and whether its sign held.
+- **`data/output/findings_summary.md`** — generated findings summary; every
+  number is Python-computed, the LLM contributes hypotheses/framing only.
+
+### Findings (from the committed run)
+- Nonprofit capacity tracks **wealth, not need**: `med_household_income` vs
+  `revenue_per_capita` ρ=+0.33, while `poverty_rate` vs `revenue_per_capita`
+  ρ=−0.29 and `unemployment` vs `ngo_per_10k` ρ=−0.31.
+- All 7 LLM-hypothesized signs were confirmed by the Python-computed statistics
+  (two of them — the food-desert pairs — are directionally right but weak).
+- The LLM's advisory gate review agreed with the rule-based
+  `proceed_with_warning` verdict; the rule-based gate remains authoritative.
+
+### Removed
+- `CLAUDE.md` (local development notes) removed from the repository.
+
 ## Checkpoint 2 — 2026-06-30
 
 The first real pipeline: load → profile (+ gate) → build tables → join + score.
