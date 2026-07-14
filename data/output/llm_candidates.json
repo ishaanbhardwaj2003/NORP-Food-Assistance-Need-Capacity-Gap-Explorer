@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "mode": "cached",
+    "model": "claude-fable-5",
+    "generated_at": "2026-07-14T22:35:22.676946+00:00",
+    "note": "Authored by Claude from the panel schema during development (no API key in the environment); regenerate live with `python scripts/run_analysis.py --live`. LLM proposals are advisory; Python computes all statistics."
+  },
+  "schema_context": {
+    "need_vars": {
+      "poverty_rate": {
+        "description": "county poverty rate, % (Poverty_Rates_2023)",
+        "n_nonnull": 2928,
+        "mean": 14.349,
+        "median": 13.5,
+        "min": 3.3,
+        "max": 49.6
+      },
+      "avg_food_desert_pct": {
+        "description": "population-weighted mean tract food-desert share, %",
+        "n_nonnull": 3027,
+        "mean": 0.555,
+        "median": 0.569,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "avg_housing_burden": {
+        "description": "population-weighted mean tract housing-cost burden, %",
+        "n_nonnull": 3027,
+        "mean": 27.067,
+        "median": 27.21,
+        "min": 0.0,
+        "max": 51.0
+      },
+      "dac_tract_pct": {
+        "description": "share of tracts flagged as disadvantaged communities",
+        "n_nonnull": 3027,
+        "mean": 0.128,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "avg_dac_score": {
+        "description": "population-weighted mean DAC score",
+        "n_nonnull": 3027,
+        "mean": 16.022,
+        "median": 16.137,
+        "min": 8.273,
+        "max": 22.243
+      },
+      "med_household_income": {
+        "description": "median household income, $ (NCCS/ACS)",
+        "n_nonnull": 3025,
+        "mean": 56610.396,
+        "median": 54840.484,
+        "min": 22792.612,
+        "max": 150826.17
+      },
+      "unemployment": {
+        "description": "unemployment rate (NCCS/ACS)",
+        "n_nonnull": 3025,
+        "mean": 0.053,
+        "median": 0.049,
+        "min": 0.0,
+        "max": 0.249
+      }
+    },
+    "capacity_vars": {
+      "ngo_per_10k": {
+        "description": "registered nonprofits per 10k residents (1M-row NGO sample)",
+        "n_nonnull": 3027,
+        "mean": 35.76,
+        "median": 26.105,
+        "min": 5.024,
+        "max": 379.747
+      },
+      "food_ngo_per_10k": {
+        "description": "'Food, Agriculture and Nutrition' nonprofits per 10k residents",
+        "n_nonnull": 3027,
+        "mean": 0.631,
+        "median": 0.176,
+        "min": 0.0,
+        "max": 42.194
+      },
+      "revenue_per_capita": {
+        "description": "990-filer total revenue per capita, $ (sparse ~3% filer join)",
+        "n_nonnull": 3027,
+        "mean": 54.152,
+        "median": 9.122,
+        "min": -30.559,
+        "max": 4281.599
+      },
+      "assets_per_capita": {
+        "description": "990-filer net assets per capita, $ (sparse ~3% filer join)",
+        "n_nonnull": 3027,
+        "mean": 105.925,
+        "median": 13.405,
+        "min": -1280.017,
+        "max": 16961.798
+      }
+    },
+    "n_counties": 3027
+  },
+  "proposal": {
+    "candidates": [
+      {
+        "need_var": "avg_food_desert_pct",
+        "capacity_var": "food_ngo_per_10k",
+        "hypothesis": "Counties with larger food-desert shares are underserved by food-focused nonprofits per capita, since food NGOs cluster where donors and infrastructure exist rather than where food access is worst.",
+        "expected_sign": "negative"
+      },
+      {
+        "need_var": "poverty_rate",
+        "capacity_var": "ngo_per_10k",
+        "hypothesis": "High-poverty counties support fewer nonprofits per 10k residents because organizational density follows local wealth, philanthropy, and professional capacity.",
+        "expected_sign": "negative"
+      },
+      {
+        "need_var": "med_household_income",
+        "capacity_var": "revenue_per_capita",
+        "hypothesis": "Wealthier counties host better-funded nonprofits, so median household income should track filer revenue per capita.",
+        "expected_sign": "positive"
+      },
+      {
+        "need_var": "poverty_rate",
+        "capacity_var": "revenue_per_capita",
+        "hypothesis": "Nonprofit financial resources per resident thin out in poor counties, mirroring the income relationship from the opposite direction.",
+        "expected_sign": "negative"
+      },
+      {
+        "need_var": "unemployment",
+        "capacity_var": "ngo_per_10k",
+        "hypothesis": "Counties with high unemployment have weaker civic infrastructure and therefore fewer registered nonprofits per capita.",
+        "expected_sign": "negative"
+      },
+      {
+        "need_var": "avg_housing_burden",
+        "capacity_var": "assets_per_capita",
+        "hypothesis": "Housing-cost burden concentrates in expensive metro counties that also host asset-rich institutions, so burden may correlate positively with nonprofit assets per capita.",
+        "expected_sign": "positive"
+      },
+      {
+        "need_var": "dac_tract_pct",
+        "capacity_var": "food_ngo_per_10k",
+        "hypothesis": "Counties with more disadvantaged-community tracts attract targeted food programming, but per-capita presence likely still lags, on net negative.",
+        "expected_sign": "negative"
+      }
+    ],
+    "gate_review": {
+      "verdict": "proceed_with_warning",
+      "rationale": "All need-side tables and joins are usable, so the panel's denominators are sound. The capacity-side auto-drop of Florida and Connecticut is logged and non-fatal, but the panel is not nationally exhaustive, which any national claim must disclose."
+    },
+    "narrative_notes": "Frame the gap score as a triage map, not a performance ranking: high-gap counties are places worth investigating, not evidence that local nonprofits underperform. Lead with the geography of the top-gap counties, then use the correlation grid to show that capacity tracks wealth rather than need. Flag the sparse 990 join and the sampled NGO table wherever financial metrics appear, and keep Florida and Connecticut's absence visible in every county count."
+  }
+}
