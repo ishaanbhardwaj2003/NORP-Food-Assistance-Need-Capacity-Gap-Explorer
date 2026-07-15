@@ -1,0 +1,298 @@
+{
+  "all_passed": true,
+  "checks": [
+    {
+      "name": "panel_fips",
+      "passed": true,
+      "detail": {
+        "rows": 3027,
+        "unique": true,
+        "malformed": 0,
+        "unknown_prefixes": []
+      }
+    },
+    {
+      "name": "no_fl_ct",
+      "passed": true,
+      "detail": {
+        "fl_counties": 0,
+        "ct_counties": 0
+      }
+    },
+    {
+      "name": "gap_math:gap_score",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 8.881784197001252e-16
+      }
+    },
+    {
+      "name": "gap_math:food_gap_score",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 8.881784197001252e-16
+      }
+    },
+    {
+      "name": "score_reproduction",
+      "passed": true,
+      "detail": {
+        "need_score": 6.661338147750939e-16,
+        "capacity_score": 4.440892098500626e-16,
+        "gap_score": 8.881784197001252e-16,
+        "food_gap_score": 8.881784197001252e-16
+      }
+    },
+    {
+      "name": "crosswalk_collisions",
+      "passed": true,
+      "detail": {
+        "lookup_rows": 3076,
+        "index_keys": 3076,
+        "colliding_keys": {}
+      }
+    },
+    {
+      "name": "county_accounting",
+      "passed": true,
+      "detail": {
+        "profiler_summary": {
+          "capacity_counties": 3029,
+          "need_counties": 3142,
+          "joined_counties": 3027,
+          "capacity_only": 2,
+          "need_only": 115
+        },
+        "need_only_total": 115,
+        "need_only_by_state": {
+          "AK": {
+            "n": 2,
+            "fips": [
+              "02013",
+              "02261"
+            ]
+          },
+          "CT": {
+            "n": 8,
+            "fips": [
+              "09001",
+              "09003",
+              "09005",
+              "09007",
+              "09009",
+              "09011",
+              "09013",
+              "09015"
+            ]
+          },
+          "FL": {
+            "n": 67,
+            "fips": [
+              "12001",
+              "12003",
+              "12005",
+              "12007",
+              "12009",
+              "12011",
+              "12013",
+              "12015",
+              "12017",
+              "12019",
+              "12021",
+              "12023",
+              "12027",
+              "12029",
+              "12031",
+              "12033",
+              "12035",
+              "12037",
+              "12039",
+              "12041",
+              "12043",
+              "12045",
+              "12047",
+              "12049",
+              "12051",
+              "12053",
+              "12055",
+              "12057",
+              "12059",
+              "12061",
+              "12063",
+              "12065",
+              "12067",
+              "12069",
+              "12071",
+              "12073",
+              "12075",
+              "12077",
+              "12079",
+              "12081",
+              "12083",
+              "12085",
+              "12086",
+              "12087",
+              "12089",
+              "12091",
+              "12093",
+              "12095",
+              "12097",
+              "12099",
+              "12101",
+              "12103",
+              "12105",
+              "12107",
+              "12109",
+              "12111",
+              "12113",
+              "12115",
+              "12117",
+              "12119",
+              "12121",
+              "12123",
+              "12125",
+              "12127",
+              "12129",
+              "12131",
+              "12133"
+            ]
+          },
+          "HI": {
+            "n": 1,
+            "fips": [
+              "15005"
+            ]
+          },
+          "ND": {
+            "n": 1,
+            "fips": [
+              "38087"
+            ]
+          },
+          "NM": {
+            "n": 1,
+            "fips": [
+              "35013"
+            ]
+          },
+          "TX": {
+            "n": 1,
+            "fips": [
+              "48301"
+            ]
+          },
+          "VA": {
+            "n": 34,
+            "fips": [
+              "51510",
+              "51520",
+              "51530",
+              "51540",
+              "51550",
+              "51570",
+              "51580",
+              "51590",
+              "51595",
+              "51610",
+              "51630",
+              "51640",
+              "51650",
+              "51660",
+              "51670",
+              "51678",
+              "51680",
+              "51683",
+              "51685",
+              "51690",
+              "51700",
+              "51710",
+              "51720",
+              "51730",
+              "51735",
+              "51740",
+              "51750",
+              "51775",
+              "51790",
+              "51800",
+              "51810",
+              "51820",
+              "51830",
+              "51840"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "correlation_grid",
+      "passed": true,
+      "detail": {
+        "rows": 28,
+        "unique_pairs": 28,
+        "missing": [],
+        "unexpected": []
+      }
+    },
+    {
+      "name": "critic_coverage",
+      "passed": true,
+      "detail": {
+        "proposed": 7,
+        "with_verdict": 7,
+        "verdicts": {
+          "supported": 3,
+          "weak_direction": 2,
+          "unsupported": 2
+        }
+      }
+    },
+    {
+      "name": "direction:gap~poverty_rate",
+      "passed": true,
+      "detail": {
+        "spearman_rho": 0.5315,
+        "expected": "positive"
+      }
+    },
+    {
+      "name": "direction:gap~ngo_per_10k",
+      "passed": true,
+      "detail": {
+        "spearman_rho": -0.7559,
+        "expected": "negative"
+      }
+    },
+    {
+      "name": "ngo_extract",
+      "passed": true,
+      "detail": {
+        "rows": 1048575,
+        "unique_eins": 1048575,
+        "lexicographically_sorted": true,
+        "interpretation": "ordered, truncated extract (Excel row limit); NOT a random sample of the 3,420,024-row source"
+      }
+    },
+    {
+      "name": "f9_provenance",
+      "passed": true,
+      "detail": {
+        "rows": 131587,
+        "non_null_ein": 131585,
+        "unique_eins": 131027,
+        "duplicated_ein_groups": 539,
+        "tax_years": {
+          "2022": 131376,
+          "2019": 123,
+          "2020": 86
+        },
+        "return_types": {
+          "990EZ": 72985,
+          "990": 58513,
+          "990PF": 87
+        },
+        "ngo_to_f9_matched": 37622,
+        "ngo_to_f9_coverage": 0.0359
+      }
+    }
+  ]
+}

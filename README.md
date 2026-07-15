@@ -28,6 +28,13 @@ response cache.
 3. **Gate review (LLM, advisory).** The agent issues a second opinion on the
    rule-based gate verdict. Disagreement is logged, never acted on — the
    rule-based verdict stays authoritative.
+4. **Statistical critic (Python, deterministic).** Every LLM-proposed pair is
+   re-tested before it may be called a finding: Benjamini-Hochberg FDR
+   correction across the full 28-test grid, a fixed-seed **state-stratified
+   permutation test** (2,000 within-state shuffles, so between-state artifacts
+   don't count as signal), and a documented effect-size floor (|ρ| ≥ 0.10,
+   a team choice). Verdicts are `supported` / `weak_direction` / `unsupported`
+   — *"the sign matched" and "the claim is supported" are different things.*
 
 > [!IMPORTANT]
 > **No manual geographic patching.** Florida is absent from `county_fips_lookup`
@@ -49,11 +56,22 @@ All raw inputs live in `data/raw/`.
 | `nccs_crosswalk_economic.csv` | 3,142 | County income / poverty / unemployment |
 
 > [!NOTE]
-> `NGOs_with_categories_1MILLION_rows.csv.gz` is a **1,048,575-row sample** of
-> the **3,420,024-row** `NGOs_with_categories` source table. Category counts
-> scale accordingly (the sample has **10,507** `Food, Agriculture and Nutrition`
-> orgs vs ~40,080 in the full table), so all county aggregates here are
-> **sample-based**.
+> `NGOs_with_categories_1MILLION_rows.csv.gz` is an **ordered, truncated
+> extract** of the **3,420,024-row** `NGOs_with_categories` source table:
+> exactly 1,048,575 rows (the Excel export limit) of unique,
+> lexicographically-sorted EINs, cut mid-range at an EIN prefix. It is **not a
+> random sample**, so national representativeness cannot be assumed; county
+> aggregates are extract-based. (The extract has **10,507**
+> `Food, Agriculture and Nutrition` orgs vs ~40,080 in the full table.)
+> `scripts/verify_outputs.py` asserts these extract properties on every run.
+
+> [!NOTE]
+> `F9_P01_T00_SUMMARY_2022.csv` contains **990, 990EZ, and 990PF** summary
+> filings (not exclusively "full 990s") with mixed tax years (2019/2020/2022)
+> and 539 duplicated-EIN groups. The pipeline keeps **one filing per EIN**
+> (latest year, revenue tie-break). Only ~3.6% of NGOs match a filing;
+> counties with **no matched filer get missing (NaN) financials, never a
+> fabricated zero**, and carry `matched_filer_count` / `filer_coverage_rate`.
 
 ## Setup
 
@@ -72,32 +90,48 @@ python scripts/run_pipeline.py --verbose
 #    (offline by default: replays the committed LLM cache, no API key needed)
 python scripts/run_analysis.py
 
+# 3) Verify every committed claim (also written to validation_report.json)
+python scripts/verify_outputs.py
+
+# 4) Unit tests (no API key, no large files)
+python -m pytest -q
+
 # Optional: refresh the LLM artifact through the Anthropic API
 ANTHROPIC_API_KEY=... python scripts/run_analysis.py --live
 
-# Fast pipeline iteration: 10k rows/file, synthetic capacity/need tables
-python scripts/run_pipeline.py --sample --mock --verbose
+# Fast smoke test in an isolated directory (never touches committed evidence)
+python scripts/run_pipeline.py --sample --mock --output-dir /tmp/norp-smoke
+python scripts/run_analysis.py --output-dir /tmp/norp-smoke --allow-stale-cache
 ```
 
 `run_pipeline.py` flags: `--sample` (10k rows/file), `--mock` (synthetic
-capacity/need tables), `--verbose`. `run_analysis.py` flags: `--live` (call the
-Anthropic API and rewrite `data/output/llm_candidates.json`), `--model`
-(default `claude-opus-4-8`), `--skip-plots`.
+capacity/need tables), `--verbose`, `--output-dir`. `run_analysis.py` flags:
+`--live` (call the Anthropic API and rewrite the cache), `--model` (default
+`claude-opus-4-8`), `--skip-plots`, `--output-dir`, `--cache`,
+`--allow-stale-cache`. The committed LLM cache carries SHA-256 hashes of the
+schema context and gate it was generated against; replaying it against a
+changed panel is rejected as stale unless explicitly overridden.
 
 ## Pipeline stages
 
 ```
 load_data → profile_data (+ gate) → [gate check] → build_capacity_table
-          → build_need_table → join_logic (inner join + gap score) → output/
+          → build_need_table → join_logic (inner join + gap scores) → output/
           → correlation_agent (LLM candidates + Python-computed grid)
+          → statistical_critic (BH FDR + stratified permutations + verdicts)
           → make_plots (figures) → findings_summary.md
+          → verify_outputs (committed validation of every claim)
 ```
 
 `gap_score = need_score − capacity_score`, where each score is the mean of the
 available indicators' z-scores. Need indicators (bounded percentages) are scored
 linearly; the per-capita capacity indicators are signed-log transformed first so
-a few financial outliers can't dominate. A high gap is a **triage signal**
-("worth investigating"), not a causal claim about nonprofit effectiveness.
+a few financial outliers can't dominate. Two gaps are reported: **`gap_score`**
+compares food-related need against *all* nonprofit capacity, and
+**`food_gap_score`** against food-sector nonprofit density specifically.
+`need_component_count` / `capacity_component_count` record how many indicators
+entered each county's score. A high gap is a **triage signal** ("worth
+investigating"), not a causal claim about nonprofit effectiveness.
 
 ## Layout
 
@@ -108,12 +142,15 @@ src/
   crosswalk.py            # automated county-name normalization (no manual patches)
   build_capacity_table.py # NGO + F9 → county capacity metrics
   build_need_table.py     # DAC + poverty + NCCS → county need metrics
-  join_logic.py           # county panel inner join + gap score
+  join_logic.py           # county panel inner join + general & food gap scores
   correlation_agent.py    # LLM candidate proposals + exhaustive Python correlations
+  statistical_critic.py   # BH FDR + state-stratified permutation critic
   make_plots.py           # top-gap / scatter / distribution / heatmap figures
 scripts/
   run_pipeline.py         # pipeline orchestration (Checkpoint 2)
   run_analysis.py         # analysis orchestration (Checkpoint 3)
+  verify_outputs.py       # committed verification of every output claim
+tests/                    # pytest suite (scoring, critic, validation, cache)
 data/
   raw/                    # committed inputs
   output/                 # generated evidence (committed, see below)
@@ -123,14 +160,21 @@ data/
 
 All committed to `data/output/` as self-contained evidence:
 
-- `joined_county_panel.csv` — one row per county with capacity metrics, need
-  metrics, and `need_score` / `capacity_score` / `gap_score`.
-- `profiler_log.json` — per-table schema and null audit, per-join match rates,
-  and the overall gate verdict with reasons.
+- `joined_county_panel.csv` — one row per county with capacity metrics
+  (including `matched_filer_count` / `filer_coverage_rate`), need metrics,
+  `need_score` / `capacity_score` / `gap_score`, the food-specific
+  `food_capacity_score` / `food_gap_score`, and per-county component counts.
+- `profiler_log.json` — per-table schema and null audit, per-join match rates
+  (including the sparse NGO→990 enrichment join), and the overall gate verdict.
 - `correlation_results.csv` — the exhaustive need × capacity Pearson/Spearman
-  grid, annotated with the LLM's proposed pairs and sign checks.
+  grid with BH-adjusted q-values, and per-proposed-pair permutation p /
+  `claim_status` / `critic_reason` from the statistical critic.
 - `llm_candidates.json` — the cached LLM artifact (schema context, candidate
-  hypotheses, advisory gate review); replayed by offline runs.
+  hypotheses, advisory gate review) with integrity hashes; replayed by offline
+  runs, rejected if stale.
+- `validation_report.json` — machine-readable result of `verify_outputs.py`,
+  including the full enumeration of the 115 need-side counties absent from the
+  panel (67 FL, 8 CT, 34 VA independent cities, 6 other).
 - `figures/` — the four Checkpoint 3 figures.
 - `findings_summary.md` — the generated findings summary (Python-computed
   numbers, LLM framing).

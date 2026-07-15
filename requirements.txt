@@ -7,3 +7,5 @@ anthropic>=0.40
 # Pearson/Spearman grid in src/correlation_agent.py.
 # anthropic is only exercised by `run_analysis.py --live`; the default offline
 # mode replays the committed data/output/llm_candidates.json with no API key.
+pytest>=8.0
+# pytest runs the committed test suite in tests/ (no API key, no large files).

@@ -6,7 +6,10 @@ County-level community *need* table.
 Output schema (one row per county_fips):
     county_fips           : 5-digit zero-padded FIPS (str)
     population            : sum of tract population
-    avg_food_desert_pct   : population-weighted mean of food_desert_pct
+    avg_food_desert_pct   : population-weighted mean of food_desert_pct. The
+                            raw tract values are 0/1 flags, so this is the
+                            population-weighted SHARE of residents in
+                            food-desert tracts, on a 0-1 scale (not 0-100).
     avg_housing_burden    : population-weighted mean of avg_housing_burden
     dac_tract_pct         : fraction of tracts with dac_status == 'true'
     avg_dac_score         : population-weighted mean of dac_score
@@ -102,7 +105,8 @@ def mock_need_table(n: int = 50, seed: int = 1,
     return pd.DataFrame({
         "county_fips": pd.array(fips, dtype="string"),
         "population": rng.integers(1_000, 2_000_000, m),
-        "avg_food_desert_pct": rng.uniform(0, 40, m),
+        # Same units as the real table: a 0-1 share, not a 0-100 percentage.
+        "avg_food_desert_pct": rng.uniform(0, 0.4, m),
         "avg_housing_burden": rng.uniform(10, 40, m),
         "dac_tract_pct": rng.uniform(0, 1, m),
         "avg_dac_score": rng.uniform(0, 30, m),

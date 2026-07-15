@@ -3,6 +3,79 @@
 All notable changes to the NORP Food Assistance Need-Capacity Gap Explorer.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## Checkpoint 3 revision — data validity + statistical critic — 2026-07-15
+
+A validity-first revision responding to the Checkpoint 2 TA feedback ("commit
+the validation itself") and to an internal audit against the TA's
+`ai-suggestions/cp3` benchmark. Committed evidence was regenerated; headline
+conclusions changed and the report says so.
+
+### Added
+- **`scripts/verify_outputs.py` + `data/output/validation_report.json`** — the
+  committed verification the TA asked for: panel FIPS integrity, FL/CT absence,
+  crosswalk-collision count, county accounting (with the full enumeration of
+  the 115 need-side counties absent from the panel: 67 FL, 8 CT, 34 VA
+  independent cities, 2 AK, 1 each HI/ND/NM/TX), gap-score math reproduction,
+  full re-scoring, exact 28-pair grid coverage, correlation-direction checks
+  (gap~poverty positive, gap~NGO-density negative), and raw-file provenance
+  (NGO extract ordering/uniqueness, F9 duplicate/year/return-type stats).
+- **`src/statistical_critic.py`** — a deterministic Critic that goes beyond
+  the naive sign check *and* beyond the TA benchmark's single-pair permutation
+  test: Benjamini-Hochberg FDR across all 28 grid tests, a fixed-seed
+  **state-stratified permutation test for every LLM-proposed pair** (2,000
+  within-state shuffles), and a documented `supported` / `weak_direction` /
+  `unsupported` classification with a team-defined |ρ| ≥ 0.10 effect floor.
+  New `correlation_results.csv` columns: `spearman_q_bh`, `permutation_p`,
+  `claim_status`, `critic_reason`.
+- **Food-specific gap** — `food_ngo_per_10k`, `food_capacity_score`, and
+  `food_gap_score` (need vs food-sector nonprofit density). The original
+  `gap_score` is unchanged in meaning and now explicitly documented as the
+  *general*-capacity gap. Rankings correlate strongly (rank ρ reported in the
+  findings summary) but are not identical.
+- **Filing coverage columns** — `matched_filer_count` and
+  `filer_coverage_rate` per county; the sparse NGO→990 enrichment join is now
+  recorded by the profiler (coverage 3.59%) instead of being invisible.
+- **Score completeness** — `need_component_count` / `capacity_component_count`
+  mark the 99 counties without poverty data and the ~800 without financials.
+- **`tests/` (34 pytest tests)** — F9 filing selection, missing-vs-zero
+  financials, gap math, component counts, BH values, critic classification
+  boundaries, permutation determinism and state-artifact behavior, LLM-output
+  dedup/truncation/sign normalization, constant-column safety, cache staleness.
+- **LLM cache integrity** — `llm_candidates.json` now carries a
+  `prompt_version`, SHA-256 hashes of the exact schema context and gate it was
+  generated against, and an explicit `source` (`live_api` vs
+  `offline_development_session`); offline replay against a changed panel or
+  gate is rejected as stale (`--allow-stale-cache` for scratch runs only).
+- **`--output-dir` on both scripts** — `--sample --mock` smoke runs can no
+  longer overwrite the committed real-run evidence.
+
+### Fixed
+- **F9 filings were being summed per EIN.** The 2022 summary file mixes tax
+  years (131,376×2022, 123×2019, 86×2020) and holds 539 duplicated-EIN groups;
+  the old code summed all of an EIN's returns. Now exactly one filing per EIN
+  is kept (latest tax year, largest-revenue tie-break, documented in
+  `select_one_filing_per_ein`).
+- **Missing financials were reported as zero.** Counties with no matched filer
+  (803 of 3,029) previously got `total_revenue/assets = 0`; they are now NaN
+  (unobserved), and a genuine reported zero survives as 0. Capacity scores for
+  those counties average their remaining indicators.
+- **Terminology** — the filings are 990/990EZ/990PF (72,985 / 58,513 / 87),
+  not "full 990s"; the NGO file is an **ordered, truncated extract** (Excel
+  row limit, EIN-sorted), not a random "sample"; `avg_food_desert_pct` is a
+  0–1 population share (mock generator aligned); `med_household_income` is
+  labeled an inverse-need/context measure.
+
+### Changed findings (honest correction)
+On the corrected panel, the LLM's 7 proposed signs no longer all match: **6/7
+match**, and the critic grades them **3 supported, 2 weak-direction, 2
+unsupported**. Notably, `poverty_rate ~ ngo_per_10k` — hugely "significant" by
+q-value — fails the state-stratified permutation test outright (p = 1.0): the
+association is a between-state artifact, not a within-state pattern. The
+wealth-capacity result (`med_household_income ~ revenue_per_capita`) weakens
+from ρ = +0.33 to +0.25 after the missing-vs-zero correction but survives the
+critic. The former blanket claim "all 7 hypothesized signs were confirmed"
+should be read through this revision.
+
 ## Checkpoint 3 — 2026-07-14
 
 The LLM-assisted analysis layer on top of the deterministic Checkpoint 2 panel:

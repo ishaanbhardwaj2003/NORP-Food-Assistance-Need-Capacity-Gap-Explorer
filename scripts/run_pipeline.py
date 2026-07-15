@@ -12,9 +12,12 @@ End-to-end orchestration for the Need-Capacity Gap Explorer.
     7. Save data/output/{profiler_log.json, joined_county_panel.csv}
 
 Flags:
-    --sample   load only 10k rows per file (fast iteration)
-    --mock     use synthetic capacity/need tables instead of full aggregation
-    --verbose  print detailed profiler / scoring output
+    --sample      load only 10k rows per file (fast iteration)
+    --mock        use synthetic capacity/need tables instead of full aggregation
+    --verbose     print detailed profiler / scoring output
+    --output-dir  where to write outputs (default data/output). Point smoke
+                  tests at a scratch directory so they never overwrite the
+                  committed real-run evidence.
 """
 
 from __future__ import annotations
@@ -38,9 +41,7 @@ from build_capacity_table import build_capacity_table, mock_capacity_table  # no
 from build_need_table import build_need_table, mock_need_table  # noqa: E402
 from join_logic import PanelBuilder  # noqa: E402
 
-OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
-PROFILER_LOG = OUTPUT_DIR / "profiler_log.json"
-PANEL_CSV = OUTPUT_DIR / "joined_county_panel.csv"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
 
 # Declared join keys per table (drives the profiler's null/completeness audit).
 KEY_COLS = {
@@ -68,6 +69,21 @@ def profile_everything(frames: dict, profiler: DataProfiler) -> None:
     profiler.record_join(
         "ngo_county_to_fips", "capacity", rpt["match_rate"],
         rpt["matched_rows"], rpt["unmatched_rows"], detail=rpt,
+    )
+
+    # Capacity-side ENRICHMENT join: NGO EIN -> 990/990EZ/990PF filing. Sparse
+    # by nature (most small nonprofits file the 990-N postcard, absent here);
+    # unmatched NGOs keep NaN financials, they are never dropped.
+    geo = resolved[resolved["county_fips"].notna()]
+    ngo_eins = geo["ein"].astype("string").str.strip().str.zfill(9)
+    f9_eins = set(frames["f9"]["org_ein"].astype("string").str.strip().str.zfill(9).dropna())
+    matched_f9 = int(ngo_eins.isin(f9_eins).sum())
+    profiler.record_join(
+        "ngo_to_f9_financials", "capacity",
+        matched_f9 / len(geo) if len(geo) else 0.0,
+        matched_f9, len(geo) - matched_f9, kind="enrichment",
+        detail={"resolved_ngos": int(len(geo)), "f9_unique_eins": len(f9_eins),
+                "note": "990/990EZ/990PF summary filings; NaN financials where unmatched"},
     )
 
     # Need-side joins: do poverty / nccs cover the disadvantaged-community counties?
@@ -101,7 +117,14 @@ def main(argv=None) -> int:
     ap.add_argument("--sample", action="store_true", help="10k rows/file")
     ap.add_argument("--mock", action="store_true", help="synthetic capacity/need tables")
     ap.add_argument("--verbose", action="store_true", help="detailed output")
+    ap.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR),
+                    help="output directory (use a scratch dir for smoke tests "
+                         "so committed evidence is never overwritten)")
     args = ap.parse_args(argv)
+
+    output_dir = Path(args.output_dir)
+    profiler_log = output_dir / "profiler_log.json"
+    panel_csv = output_dir / "joined_county_panel.csv"
 
     print(f"[1/7] Loading raw data (sample={args.sample}) ...")
     frames = DataLoader(sample_mode=args.sample).load_all()
@@ -114,14 +137,14 @@ def main(argv=None) -> int:
 
     print("[3/7] Quality gate ...")
     gate = profiler.gate()
-    profiler.save(PROFILER_LOG)
+    profiler.save(profiler_log)
     print(f"      verdict: {gate['verdict'].upper()}")
     if args.verbose:
         for r in gate["reasons"]:
             print(f"        - {r}")
     if gate["verdict"] == STOP:
         print("      STOP: a need-side table/join failed the quality gate. Halting.")
-        print(f"      See {PROFILER_LOG}")
+        print(f"      See {profiler_log}")
         return 1
 
     print(f"[4-5/7] Building capacity + need tables (mock={args.mock}) ...")
@@ -134,15 +157,15 @@ def main(argv=None) -> int:
     desc = builder.describe(panel)
 
     print("[7/7] Saving outputs ...")
-    builder.save(panel, PANEL_CSV)
+    builder.save(panel, panel_csv)
     # Fold the join summary + scoring stats into the profiler log for evidence.
-    log = json.loads(PROFILER_LOG.read_text())
+    log = json.loads(profiler_log.read_text())
     log["panel"] = desc
     log["panel"]["rows"] = int(len(panel))
-    PROFILER_LOG.write_text(json.dumps(log, indent=2))
+    profiler_log.write_text(json.dumps(log, indent=2))
 
-    print(f"      panel rows: {len(panel)}  ->  {PANEL_CSV}")
-    print(f"      profiler log ->  {PROFILER_LOG}")
+    print(f"      panel rows: {len(panel)}  ->  {panel_csv}")
+    print(f"      profiler log ->  {profiler_log}")
     if args.verbose:
         print("      join summary:", json.dumps(desc["summary"]))
         print("      score stats :", json.dumps(desc["stats"]))

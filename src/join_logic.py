@@ -2,15 +2,24 @@
 join_logic.py
 
 Joins the county-level capacity and need tables into a single panel and computes
-the explainable gap score.
+the explainable gap scores.
 
-    need_score     = mean z-score of available need indicators
-    capacity_score = mean z-score of available (per-capita) capacity indicators
-    gap_score      = need_score - capacity_score
+    need_score          = mean z-score of available need indicators
+    capacity_score      = mean z-score of available (per-capita) GENERAL
+                          nonprofit-capacity indicators
+    gap_score           = need_score - capacity_score        (general gap)
+    food_capacity_score = z-score of food-nonprofit density per 10k residents
+    food_gap_score      = need_score - food_capacity_score   (food-specific gap)
 
-A high gap_score means need outpaces capacity -- a triage signal, not a causal
-claim. The join is an inner join on `county_fips`: counties present on only one
-side (e.g. FL/CT capacity gaps already auto-dropped upstream) fall out here.
+`gap_score` measures food-related need against ALL nonprofit capacity;
+`food_gap_score` measures it against food-sector capacity specifically
+(density only -- food-NGO financials are too sparse to score). Both are triage
+signals, not causal claims. `need_component_count` / `capacity_component_count`
+record how many indicators actually entered each county's score, since 99
+counties lack poverty data and ~800 lack any matched 990 filing.
+
+The join is an inner join on `county_fips`: counties present on only one side
+(e.g. FL/CT capacity gaps already auto-dropped upstream) fall out here.
 """
 
 from __future__ import annotations
@@ -24,6 +33,9 @@ from scipy.stats import zscore
 NEED_INDICATORS = ["poverty_rate", "avg_food_desert_pct", "avg_housing_burden"]
 # Capacity indicators are computed per-capita below before scoring.
 CAPACITY_INDICATORS = ["ngo_per_10k", "revenue_per_capita", "assets_per_capita"]
+# Food-sector capacity: density only. Food-NGO financials are a sensitivity
+# footnote (few hundred food NGOs nationwide match a filing), not an indicator.
+FOOD_CAPACITY_INDICATORS = ["food_ngo_per_10k"]
 
 
 def _signed_log(s: pd.Series) -> pd.Series:
@@ -51,29 +63,44 @@ def _zmean(df: pd.DataFrame, cols: list[str]) -> pd.Series:
     return z.mean(axis=1, skipna=True) if not z.empty else pd.Series(np.nan, index=df.index)
 
 
+def _component_count(df: pd.DataFrame, cols: list[str]) -> pd.Series:
+    """How many of `cols` are non-null per row (score completeness)."""
+    cols = [c for c in cols if c in df.columns]
+    if not cols:
+        return pd.Series(0, index=df.index)
+    return (
+        df[cols].apply(pd.to_numeric, errors="coerce").notna().sum(axis=1).astype(int)
+    )
+
+
 def score_panel(panel: pd.DataFrame) -> pd.DataFrame:
     """Add per-capita capacity columns and need/capacity/gap scores."""
     df = panel.copy()
     pop = pd.to_numeric(df.get("population"), errors="coerce").replace(0, np.nan)
 
     df["ngo_per_10k"] = pd.to_numeric(df.get("ngo_count"), errors="coerce") / pop * 10_000
+    df["food_ngo_per_10k"] = pd.to_numeric(df.get("food_ngo_count"), errors="coerce") / pop * 10_000
     df["revenue_per_capita"] = pd.to_numeric(df.get("total_revenue"), errors="coerce") / pop
     df["assets_per_capita"] = pd.to_numeric(df.get("total_assets"), errors="coerce") / pop
 
     # Raw per-capita columns are kept in the output for interpretability, but the
-    # capacity score is computed on their signed-log transform so a few financial
+    # capacity scores are computed on their signed-log transform so a few financial
     # outliers can't dominate (see _signed_log). Need indicators are bounded
     # percentages with low skew, so they are scored linearly.
-    log_cols = []
-    for c in CAPACITY_INDICATORS:
+    log_cols, food_log_cols = [], []
+    for c in CAPACITY_INDICATORS + FOOD_CAPACITY_INDICATORS:
         lc = f"_log_{c}"
         df[lc] = _signed_log(df[c])
-        log_cols.append(lc)
+        (food_log_cols if c in FOOD_CAPACITY_INDICATORS else log_cols).append(lc)
 
     df["need_score"] = _zmean(df, NEED_INDICATORS)
     df["capacity_score"] = _zmean(df, log_cols)
     df["gap_score"] = df["need_score"] - df["capacity_score"]
-    return df.drop(columns=log_cols)
+    df["food_capacity_score"] = _zmean(df, food_log_cols)
+    df["food_gap_score"] = df["need_score"] - df["food_capacity_score"]
+    df["need_component_count"] = _component_count(df, NEED_INDICATORS)
+    df["capacity_component_count"] = _component_count(df, CAPACITY_INDICATORS)
+    return df.drop(columns=log_cols + food_log_cols)
 
 
 class PanelBuilder:
@@ -104,7 +131,8 @@ class PanelBuilder:
         return path
 
     def describe(self, panel: pd.DataFrame, top_n: int = 10) -> dict:
-        metrics = ["need_score", "capacity_score", "gap_score"]
+        metrics = ["need_score", "capacity_score", "gap_score",
+                   "food_capacity_score", "food_gap_score"]
         stats = {
             m: {
                 "mean": round(float(panel[m].mean()), 4),

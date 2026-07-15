@@ -1,29 +1,29 @@
-need_var,capacity_var,pearson_r,pearson_p,spearman_r,spearman_p,n_counties,llm_proposed,expected_sign,hypothesis,sign_matches
-med_household_income,revenue_per_capita,0.1026,1.5393649597194325e-08,0.3306,4.414300882011845e-78,3025,True,positive,"Wealthier counties host better-funded nonprofits, so median household income should track filer revenue per capita.",True
-med_household_income,assets_per_capita,0.0797,1.1406460636915116e-05,0.3179,5.086087026481686e-72,3025,False,,,
-unemployment,ngo_per_10k,-0.2218,5.029540976228075e-35,-0.3099,2.4550349717804947e-68,3025,True,negative,Counties with high unemployment have weaker civic infrastructure and therefore fewer registered nonprofits per capita.,True
-avg_dac_score,ngo_per_10k,-0.2295,1.8460656597142777e-37,-0.3043,6.795056728830053e-66,3027,False,,,
-poverty_rate,revenue_per_capita,-0.1018,3.419326963409006e-08,-0.2853,6.066540032720704e-56,2928,True,negative,"Nonprofit financial resources per resident thin out in poor counties, mirroring the income relationship from the opposite direction.",True
-poverty_rate,assets_per_capita,-0.0973,1.315776762003879e-07,-0.2851,7.083464378836663e-56,2928,False,,,
-poverty_rate,ngo_per_10k,-0.2035,9.689952179694586e-29,-0.2296,2.4344373881547623e-36,2928,True,negative,"High-poverty counties support fewer nonprofits per 10k residents because organizational density follows local wealth, philanthropy, and professional capacity.",True
-avg_housing_burden,ngo_per_10k,-0.1205,2.919164528734485e-11,-0.2117,5.214679033973782e-32,3027,False,,,
-dac_tract_pct,ngo_per_10k,-0.1077,2.8602994318450415e-09,-0.1833,2.718050762646321e-24,3027,False,,,
-avg_dac_score,revenue_per_capita,-0.0701,0.00011363217847551766,-0.1705,3.457324900069106e-21,3027,False,,,
-avg_dac_score,assets_per_capita,-0.051,0.00499330403330525,-0.1626,2.1970322464244462e-19,3027,False,,,
-med_household_income,ngo_per_10k,0.085,2.8757042907713475e-06,0.1544,1.3243551204877496e-17,3025,False,,,
-poverty_rate,food_ngo_per_10k,-0.0676,0.0002541907804355145,-0.1396,3.201942246002872e-14,2928,False,,,
-med_household_income,food_ngo_per_10k,-0.0122,0.5011201114881733,0.1369,3.9983592865110705e-14,3025,False,,,
-avg_housing_burden,revenue_per_capita,0.0158,0.3846284170083376,0.1346,1.0565478069872747e-13,3027,False,,,
-avg_housing_burden,assets_per_capita,-0.0017,0.9237481468053675,0.1172,9.947161725808857e-11,3027,True,positive,"Housing-cost burden concentrates in expensive metro counties that also host asset-rich institutions, so burden may correlate positively with nonprofit assets per capita.",True
-unemployment,assets_per_capita,-0.0576,0.0015302687949996989,-0.115,2.2824086589099678e-10,3025,False,,,
-avg_housing_burden,food_ngo_per_10k,0.0089,0.6230604466318527,0.107,3.585958700453124e-09,3027,False,,,
-unemployment,revenue_per_capita,-0.0633,0.0004941712351601875,-0.1051,6.758410668533426e-09,3025,False,,,
-avg_food_desert_pct,food_ngo_per_10k,-0.0073,0.6887789890656147,-0.0923,3.5930496155698763e-07,3027,True,negative,"Counties with larger food-desert shares are underserved by food-focused nonprofits per capita, since food NGOs cluster where donors and infrastructure exist rather than where food access is worst.",True
-avg_dac_score,food_ngo_per_10k,-0.0882,1.180952222618435e-06,-0.0884,1.1128654385901672e-06,3027,False,,,
-avg_food_desert_pct,ngo_per_10k,-0.0169,0.3535138566574719,0.0556,0.0022003302930700846,3027,False,,,
-dac_tract_pct,revenue_per_capita,-0.0166,0.3612686408676742,0.0547,0.0026134125109851213,3027,False,,,
-dac_tract_pct,assets_per_capita,0.0024,0.8971126359651489,0.0486,0.007460855169541738,3027,False,,,
-avg_food_desert_pct,assets_per_capita,-0.0502,0.005764122442286778,-0.0352,0.052650843935122114,3027,False,,,
-unemployment,food_ngo_per_10k,-0.0641,0.00042361715830194663,-0.0315,0.08345316446115203,3025,False,,,
-avg_food_desert_pct,revenue_per_capita,-0.0566,0.0018364782589192518,-0.0259,0.1538114495848132,3027,False,,,
-dac_tract_pct,food_ngo_per_10k,-0.0619,0.0006533911470097949,-0.0202,0.26667904116215885,3027,True,negative,"Counties with more disadvantaged-community tracts attract targeted food programming, but per-capita presence likely still lags, on net negative.",True
+need_var,capacity_var,pearson_r,pearson_p,spearman_r,spearman_p,n_counties,llm_proposed,expected_sign,hypothesis,sign_matches,spearman_q_bh,permutation_p,claim_status,critic_reason
+unemployment,ngo_per_10k,-0.2218,5.029540976228075e-35,-0.3099,2.4550349717804947e-68,3025,True,negative,Counties with high unemployment have weaker civic infrastructure and therefore fewer registered nonprofits per capita.,True,6.874097920985385e-67,0.0004997501249375312,supported,sign matches; BH q=6.9e-67; state-stratified permutation p=0.0005; |rho|=0.31 >= 0.1
+avg_dac_score,ngo_per_10k,-0.2295,1.8460656597142777e-37,-0.3043,6.795056728830053e-66,3027,False,,,,9.513079420362075e-65,,,
+med_household_income,revenue_per_capita,0.0737,0.0005107024685099558,0.2483,1.499019552200975e-32,2220,True,positive,"Wealthier counties host better-funded nonprofits, so median household income should track filer revenue per capita.",True,1.0493136865406826e-31,0.0004997501249375312,supported,sign matches; BH q=1e-31; state-stratified permutation p=0.0005; |rho|=0.25 >= 0.1
+poverty_rate,revenue_per_capita,-0.0886,3.724286492723567e-05,-0.2415,4.511311035781398e-30,2162,True,negative,"Nonprofit financial resources per resident thin out in poor counties, mirroring the income relationship from the opposite direction.",True,2.1052784833646522e-29,0.0004997501249375312,supported,sign matches; BH q=2.1e-29; state-stratified permutation p=0.0005; |rho|=0.24 >= 0.1
+poverty_rate,assets_per_capita,-0.0868,5.313421792634144e-05,-0.2337,3.5068771923368608e-28,2160,False,,,,1.4027508769347443e-27,,,
+poverty_rate,ngo_per_10k,-0.2035,9.689952179694586e-29,-0.2296,2.4344373881547623e-36,2928,True,negative,"High-poverty counties support fewer nonprofits per 10k residents because organizational density follows local wealth, philanthropy, and professional capacity.",True,2.2721415622777783e-35,1.0,weak_direction,"sign matches, q=2.3e-35, but fails the state-stratified permutation test (p=1) -- the association may be a between-state artifact"
+med_household_income,assets_per_capita,0.0517,0.01482098292092335,0.221,5.948659896669013e-26,2218,False,,,,2.0820309638341545e-25,,,
+avg_dac_score,revenue_per_capita,-0.073,0.0005737304474909477,-0.2127,3.82811263677336e-24,2221,False,,,,1.0718715382965408e-23,,,
+avg_housing_burden,ngo_per_10k,-0.1205,2.919164528734485e-11,-0.2117,5.214679033973782e-32,3027,False,,,,2.9202202590253176e-31,,,
+unemployment,assets_per_capita,-0.0692,0.0011070401455412768,-0.2003,1.642249125886552e-21,2218,False,,,,4.1802705022566774e-21,,,
+avg_dac_score,assets_per_capita,-0.0507,0.01695310706727621,-0.1936,3.5083593287782226e-20,2219,False,,,,8.186171767149186e-20,,,
+unemployment,revenue_per_capita,-0.0762,0.0003275158361960697,-0.1852,1.3878415955931534e-18,2220,False,,,,2.9891972828160224e-18,,,
+dac_tract_pct,ngo_per_10k,-0.1077,2.8602994318450415e-09,-0.1833,2.718050762646321e-24,3027,False,,,,8.456157928232998e-24,,,
+med_household_income,ngo_per_10k,0.085,2.8757042907713475e-06,0.1544,1.3243551204877496e-17,3025,False,,,,2.648710240975499e-17,,,
+poverty_rate,food_ngo_per_10k,-0.0676,0.0002541907804355145,-0.1396,3.201942246002872e-14,2928,False,,,,5.976958859205361e-14,,,
+med_household_income,food_ngo_per_10k,-0.0122,0.5011201114881733,0.1369,3.9983592865110705e-14,3025,False,,,,6.997128751394373e-14,,,
+avg_housing_burden,food_ngo_per_10k,0.0089,0.6230604466318527,0.107,3.585958700453124e-09,3027,False,,,,5.906284918393381e-09,,,
+avg_food_desert_pct,food_ngo_per_10k,-0.0073,0.6887789890656028,-0.0923,3.5930496155698763e-07,3027,True,negative,"Counties with larger food-desert shares are underserved by food-focused nonprofits per capita, since food NGOs cluster where donors and infrastructure exist rather than where food access is worst.",True,5.589188290886475e-07,0.0079960019990005,weak_direction,"sign matches and significant, but |rho|=0.092 is below the team effect-size floor of 0.1"
+avg_dac_score,food_ngo_per_10k,-0.0882,1.180952222618435e-06,-0.0884,1.1128654385901672e-06,3027,False,,,,1.6400122252907728e-06,,,
+dac_tract_pct,revenue_per_capita,-0.019,0.36956148715978737,-0.0653,0.00206686561309505,2221,False,,,,0.0028936118583330703,,,
+dac_tract_pct,assets_per_capita,0.007,0.7412801327150983,-0.0636,0.0027442133925708267,2219,False,,,,0.003492635226908325,,,
+avg_food_desert_pct,ngo_per_10k,-0.0169,0.3535138566574719,0.0556,0.0022003302930700846,3027,False,,,,0.0029337737240934464,,,
+avg_housing_burden,assets_per_capita,-0.0402,0.058335112787251904,-0.0408,0.05491046482959782,2219,True,positive,"Housing-cost burden concentrates in expensive metro counties that also host asset-rich institutions, so burden may correlate positively with nonprofit assets per capita.",False,0.06684752240124951,0.35782108945527236,unsupported,"measured sign is negative, hypothesis said positive"
+avg_food_desert_pct,revenue_per_capita,-0.0642,0.0024576537478403922,0.0354,0.09551753352020909,2221,False,,,,0.10697963754263418,,,
+unemployment,food_ngo_per_10k,-0.0641,0.00042361715830194663,-0.0315,0.08345316446115203,3025,False,,,,0.09736202520467736,,,
+dac_tract_pct,food_ngo_per_10k,-0.0619,0.0006533911470097949,-0.0202,0.26667904116215885,3027,True,negative,"Counties with more disadvantaged-community tracts attract targeted food programming, but per-capita presence likely still lags, on net negative.",True,0.287192813559248,0.1634182908545727,unsupported,sign matches but not significant after BH FDR (q=0.287 >= 0.05)
+avg_housing_burden,revenue_per_capita,-0.0204,0.3375312135540924,-0.0175,0.41098956332022707,2221,False,,,,0.426211398998754,,,
+avg_food_desert_pct,assets_per_capita,-0.057,0.0072295703214181346,0.0118,0.5779595005171089,2219,False,,,,0.5779595005171089,,,

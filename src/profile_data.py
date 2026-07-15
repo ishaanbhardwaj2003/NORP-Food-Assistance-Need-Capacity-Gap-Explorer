@@ -83,18 +83,25 @@ class DataProfiler:
 
     # -- join validation ---------------------------------------------------
     def record_join(self, name: str, side: str, match_rate: float,
-                    matched: int, unmatched: int, detail: dict | None = None):
+                    matched: int, unmatched: int, detail: dict | None = None,
+                    kind: str = "join"):
         """
         side : 'need' or 'capacity'. Determines gate severity:
                need-side DROP -> stop; capacity-side DROP -> warn (auto-drop).
+        kind : 'join' for row-defining joins (unmatched rows are dropped) or
+               'enrichment' for optional attribute joins (unmatched rows are
+               KEPT with NaN attributes, e.g. the sparse NGO->990 financials).
+               Enrichment joins surface as a warning for visibility but are
+               expected to be sparse and never drop rows.
         """
         entry = {
             "name": name,
             "side": side,
+            "kind": kind,
             "match_rate": round(float(match_rate), 4),
             "matched": int(matched),
             "unmatched": int(unmatched),
-            "verdict": classify(match_rate),
+            "verdict": classify(match_rate) if kind == "join" else "enrichment",
             "detail": detail or {},
         }
         self.joins.append(entry)
@@ -114,6 +121,12 @@ class DataProfiler:
     @staticmethod
     def _join_signal(j: dict) -> tuple[str, str] | None:
         """Map a join report to (verdict, reason), or None if clean."""
+        if j.get("kind") == "enrichment":
+            # Expected-sparse attribute join: rows are kept with NaN, never
+            # dropped. Warn for visibility so the coverage is on the record.
+            return PROCEED_WARN, (
+                f"enrichment join '{j['name']}' coverage={j['match_rate']} -- "
+                f"{j['unmatched']} rows keep NaN attributes (kept, not dropped)")
         if j["verdict"] == DROP and j["side"] == "need":
             return STOP, (f"need-side join '{j['name']}' match_rate="
                           f"{j['match_rate']} below DROP threshold")
