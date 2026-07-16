@@ -110,8 +110,8 @@ def write_findings_summary(panel: pd.DataFrame, corrs: pd.DataFrame,
     gapcmp = _gap_rank_comparison(panel)
     coverage = pd.to_numeric(panel["filer_coverage_rate"], errors="coerce")
     n_states = panel["county_fips"].str[:2].nunique()
-    n_unobserved_fin = int(pd.to_numeric(panel["total_revenue"],
-                                         errors="coerce").isna().sum())
+    n_no_filer = int((pd.to_numeric(panel["matched_filer_count"],
+                                    errors="coerce") == 0).sum())
 
     top_rows = "\n".join(
         f"| {r.county_fips} | {r.county_name if pd.notna(r.county_name) else '—'}, "
@@ -136,8 +136,8 @@ Connecticut auto-dropped by the quality gate), the need-capacity gap score is
 approximately symmetric (median {gap.median():+.2f}, std {gap.std():.2f},
 range {gap.min():+.2f} to {gap.max():+.2f}). The counties where food-related
 need most outpaces nonprofit capacity are concentrated in the Arkansas and
-Mississippi Delta, the Texas border, the Alabama Black Belt, Appalachian
-Kentucky, and reservation counties in the Dakotas.
+Mississippi Delta, the Texas border, the Georgia Black Belt, and Appalachian
+Kentucky.
 
 `gap_score` measures food-related need against **all** nonprofit capacity;
 `food_gap_score` measures it against food-sector nonprofit density
@@ -197,7 +197,7 @@ of which **{verdicts['n_supported']} supported**,
   representativeness cannot be assumed.
 - The financial join matches 990/990EZ/990PF summary filings for ~3.6% of
   NGOs (median county filer coverage {coverage.median():.1%}).
-  {n_unobserved_fin} counties have **no matched filer**: their revenue/assets
+  {n_no_filer} counties have **no matched filer**: their revenue/assets
   are reported as *missing* (NaN), never as zero, and their capacity score
   averages the remaining indicators (`capacity_component_count` records this).
 - 99 counties lack poverty data; `need_component_count` marks them.

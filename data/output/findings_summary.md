@@ -14,8 +14,8 @@ Connecticut auto-dropped by the quality gate), the need-capacity gap score is
 approximately symmetric (median +0.11, std 1.17,
 range -4.38 to +5.03). The counties where food-related
 need most outpaces nonprofit capacity are concentrated in the Arkansas and
-Mississippi Delta, the Texas border, the Alabama Black Belt, Appalachian
-Kentucky, and reservation counties in the Dakotas.
+Mississippi Delta, the Texas border, the Georgia Black Belt, and Appalachian
+Kentucky.
 
 `gap_score` measures food-related need against **all** nonprofit capacity;
 `food_gap_score` measures it against food-sector nonprofit density
@@ -99,7 +99,7 @@ Frame the gap score as a triage map, not a performance ranking: high-gap countie
   representativeness cannot be assumed.
 - The financial join matches 990/990EZ/990PF summary filings for ~3.6% of
   NGOs (median county filer coverage 3.0%).
-  806 counties have **no matched filer**: their revenue/assets
+  803 counties have **no matched filer**: their revenue/assets
   are reported as *missing* (NaN), never as zero, and their capacity score
   averages the remaining indicators (`capacity_component_count` records this).
 - 99 counties lack poverty data; `need_component_count` marks them.
