@@ -1,0 +1,324 @@
+{
+  "extract_rows": 1048575,
+  "full_rows": 3420024,
+  "overall_coverage": 0.3066,
+  "extract_ein_sorted": true,
+  "extract_ein_max": "362739299",
+  "cut_interpretation": "The extract is the first 1,048,575 rows (the Excel export limit) of the EIN-lexicographically-sorted table; every EIN sorting above the cut point is absent wholesale, and pre-2001 EIN prefixes encode IRS district geography, so the cut is geographically structured rather than random.",
+  "food_category": {
+    "extract": 10507,
+    "full": 40086,
+    "coverage": 0.2621,
+    "note": "food-sector coverage vs overall coverage shows the cut under-sampled the food sector"
+  },
+  "llm_flag_nonnull": {
+    "extract": 0,
+    "full": 0,
+    "note": "is_category_LLM_generated is null on every row of BOTH files: upstream category provenance is unverifiable"
+  },
+  "state_coverage": {
+    "AK": {
+      "extract_rows": 1665,
+      "full_rows": 10333,
+      "coverage": 0.1611
+    },
+    "HI": {
+      "extract_rows": 2936,
+      "full_rows": 16430,
+      "coverage": 0.1787
+    },
+    "UT": {
+      "extract_rows": 3964,
+      "full_rows": 22095,
+      "coverage": 0.1794
+    },
+    "ND": {
+      "extract_rows": 2188,
+      "full_rows": 12098,
+      "coverage": 0.1809
+    },
+    "AZ": {
+      "extract_rows": 9722,
+      "full_rows": 53475,
+      "coverage": 0.1818
+    },
+    "WA": {
+      "extract_rows": 14316,
+      "full_rows": 77376,
+      "coverage": 0.185
+    },
+    "TX": {
+      "extract_rows": 47010,
+      "full_rows": 252126,
+      "coverage": 0.1865
+    },
+    "OR": {
+      "extract_rows": 8928,
+      "full_rows": 47814,
+      "coverage": 0.1867
+    },
+    "MT": {
+      "extract_rows": 3683,
+      "full_rows": 19548,
+      "coverage": 0.1884
+    },
+    "SC": {
+      "extract_rows": 9453,
+      "full_rows": 49756,
+      "coverage": 0.19
+    },
+    "TN": {
+      "extract_rows": 12879,
+      "full_rows": 65684,
+      "coverage": 0.1961
+    },
+    "CO": {
+      "extract_rows": 12771,
+      "full_rows": 64954,
+      "coverage": 0.1966
+    },
+    "NE": {
+      "extract_rows": 5170,
+      "full_rows": 26194,
+      "coverage": 0.1974
+    },
+    "MN": {
+      "extract_rows": 14051,
+      "full_rows": 70942,
+      "coverage": 0.1981
+    },
+    "LA": {
+      "extract_rows": 8885,
+      "full_rows": 44802,
+      "coverage": 0.1983
+    },
+    "OK": {
+      "extract_rows": 8383,
+      "full_rows": 42206,
+      "coverage": 0.1986
+    },
+    "NC": {
+      "extract_rows": 19441,
+      "full_rows": 97571,
+      "coverage": 0.1992
+    },
+    "MS": {
+      "extract_rows": 5607,
+      "full_rows": 28140,
+      "coverage": 0.1993
+    },
+    "KS": {
+      "extract_rows": 7073,
+      "full_rows": 35432,
+      "coverage": 0.1996
+    },
+    "MO": {
+      "extract_rows": 15482,
+      "full_rows": 77113,
+      "coverage": 0.2008
+    },
+    "IA": {
+      "extract_rows": 10400,
+      "full_rows": 51638,
+      "coverage": 0.2014
+    },
+    "NM": {
+      "extract_rows": 4339,
+      "full_rows": 21497,
+      "coverage": 0.2018
+    },
+    "MD": {
+      "extract_rows": 14785,
+      "full_rows": 73245,
+      "coverage": 0.2019
+    },
+    "VA": {
+      "extract_rows": 18378,
+      "full_rows": 90853,
+      "coverage": 0.2023
+    },
+    "MI": {
+      "extract_rows": 21289,
+      "full_rows": 105176,
+      "coverage": 0.2024
+    },
+    "GA": {
+      "extract_rows": 20768,
+      "full_rows": 101740,
+      "coverage": 0.2041
+    },
+    "ID": {
+      "extract_rows": 3777,
+      "full_rows": 18361,
+      "coverage": 0.2057
+    },
+    "FL": {
+      "extract_rows": 38915,
+      "full_rows": 188675,
+      "coverage": 0.2063
+    },
+    "SD": {
+      "extract_rows": 2809,
+      "full_rows": 13602,
+      "coverage": 0.2065
+    },
+    "AR": {
+      "extract_rows": 6463,
+      "full_rows": 30775,
+      "coverage": 0.21
+    },
+    "WI": {
+      "extract_rows": 14777,
+      "full_rows": 69945,
+      "coverage": 0.2113
+    },
+    "WY": {
+      "extract_rows": 2147,
+      "full_rows": 10030,
+      "coverage": 0.2141
+    },
+    "NV": {
+      "extract_rows": 5457,
+      "full_rows": 25249,
+      "coverage": 0.2161
+    },
+    "AL": {
+      "extract_rows": 10423,
+      "full_rows": 46497,
+      "coverage": 0.2242
+    },
+    "IL": {
+      "extract_rows": 35240,
+      "full_rows": 145310,
+      "coverage": 0.2425
+    },
+    "CA": {
+      "extract_rows": 87919,
+      "full_rows": 361486,
+      "coverage": 0.2432
+    },
+    "WV": {
+      "extract_rows": 5577,
+      "full_rows": 22312,
+      "coverage": 0.25
+    },
+    "DE": {
+      "extract_rows": 3674,
+      "full_rows": 14556,
+      "coverage": 0.2524
+    },
+    "MA": {
+      "extract_rows": 20411,
+      "full_rows": 78513,
+      "coverage": 0.26
+    },
+    "RI": {
+      "extract_rows": 3271,
+      "full_rows": 12565,
+      "coverage": 0.2603
+    },
+    "KY": {
+      "extract_rows": 10604,
+      "full_rows": 40404,
+      "coverage": 0.2624
+    },
+    "DC": {
+      "extract_rows": 9180,
+      "full_rows": 34195,
+      "coverage": 0.2685
+    },
+    "CT": {
+      "extract_rows": 11352,
+      "full_rows": 41739,
+      "coverage": 0.272
+    },
+    "NJ": {
+      "extract_rows": 57581,
+      "full_rows": 92443,
+      "coverage": 0.6229
+    },
+    "NY": {
+      "extract_rows": 139046,
+      "full_rows": 210795,
+      "coverage": 0.6596
+    },
+    "IN": {
+      "extract_rows": 51432,
+      "full_rows": 77616,
+      "coverage": 0.6626
+    },
+    "NH": {
+      "extract_rows": 11037,
+      "full_rows": 16428,
+      "coverage": 0.6718
+    },
+    "OH": {
+      "extract_rows": 94040,
+      "full_rows": 138807,
+      "coverage": 0.6775
+    },
+    "VT": {
+      "extract_rows": 8304,
+      "full_rows": 12005,
+      "coverage": 0.6917
+    },
+    "PA": {
+      "extract_rows": 98627,
+      "full_rows": 141072,
+      "coverage": 0.6991
+    },
+    "ME": {
+      "extract_rows": 12946,
+      "full_rows": 18406,
+      "coverage": 0.7034
+    }
+  },
+  "worst_covered_states": [
+    {
+      "state": "AK",
+      "coverage": 0.1611
+    },
+    {
+      "state": "HI",
+      "coverage": 0.1787
+    },
+    {
+      "state": "UT",
+      "coverage": 0.1794
+    },
+    {
+      "state": "ND",
+      "coverage": 0.1809
+    },
+    {
+      "state": "AZ",
+      "coverage": 0.1818
+    },
+    {
+      "state": "WA",
+      "coverage": 0.185
+    },
+    {
+      "state": "TX",
+      "coverage": 0.1865
+    },
+    {
+      "state": "OR",
+      "coverage": 0.1867
+    }
+  ],
+  "best_covered_states": [
+    {
+      "state": "VT",
+      "coverage": 0.6917
+    },
+    {
+      "state": "PA",
+      "coverage": 0.6991
+    },
+    {
+      "state": "ME",
+      "coverage": 0.7034
+    }
+  ]
+}

@@ -3,65 +3,65 @@
     "mode": "cached",
     "source": "offline_development_session",
     "model": "claude-fable-5",
-    "generated_at": "2026-07-15T15:46:19.542546+00:00",
+    "generated_at": "2026-07-27T03:36:34.565626+00:00",
     "prompt_version": "2",
-    "schema_context_sha256": "279d71fa33040fcc9bbe11a8aa707a1f854dff4032f2e7ed1ffe23650f7760c1",
-    "gate_sha256": "87df487d7621dff1e73a7f1846555d8e272073a5913af8ad2e6484064e394305",
+    "schema_context_sha256": "8325adb99e7cfdc63b7e71ca388b257fdbd12e73cd5cbab00d3f2a8da38a56aa",
+    "gate_sha256": "b919306f802ed621f660c175935bceab00857013a107fd425bec4d119d94dfdb",
     "note": "Authored by Claude from the panel schema during development (no API key in the environment); regenerate live with `python scripts/run_analysis.py --live`. LLM proposals are advisory; Python computes all statistics. Hashes bind this artifact to the exact panel schema context and gate it was written against; a mismatched replay is rejected as stale."
   },
   "schema_context": {
     "need_vars": {
       "poverty_rate": {
         "description": "county poverty rate, % (Poverty_Rates_2023)",
-        "n_nonnull": 2928,
-        "mean": 14.349,
+        "n_nonnull": 2931,
+        "mean": 14.348,
         "median": 13.5,
         "min": 3.3,
         "max": 49.6
       },
       "avg_food_desert_pct": {
         "description": "population-weighted share of residents in food-desert tracts, 0-1 scale",
-        "n_nonnull": 3027,
-        "mean": 0.555,
-        "median": 0.569,
+        "n_nonnull": 3066,
+        "mean": 0.559,
+        "median": 0.574,
         "min": 0.0,
         "max": 1.0
       },
       "avg_housing_burden": {
         "description": "population-weighted mean tract housing-cost burden, %",
-        "n_nonnull": 3027,
-        "mean": 27.067,
-        "median": 27.21,
+        "n_nonnull": 3066,
+        "mean": 27.092,
+        "median": 27.241,
         "min": 0.0,
         "max": 51.0
       },
       "dac_tract_pct": {
         "description": "share of tracts flagged as disadvantaged communities",
-        "n_nonnull": 3027,
-        "mean": 0.128,
+        "n_nonnull": 3066,
+        "mean": 0.131,
         "median": 0.0,
         "min": 0.0,
         "max": 1.0
       },
       "avg_dac_score": {
         "description": "population-weighted mean DAC score",
-        "n_nonnull": 3027,
-        "mean": 16.022,
-        "median": 16.137,
+        "n_nonnull": 3066,
+        "mean": 16.02,
+        "median": 16.136,
         "min": 8.273,
         "max": 22.243
       },
       "med_household_income": {
         "description": "median household income, $ (NCCS/ACS) -- an INVERSE-need/context measure: high income = low need",
-        "n_nonnull": 3025,
-        "mean": 56610.396,
-        "median": 54840.484,
+        "n_nonnull": 3064,
+        "mean": 56663.967,
+        "median": 54850.553,
         "min": 22792.612,
         "max": 150826.17
       },
       "unemployment": {
         "description": "unemployment rate (NCCS/ACS)",
-        "n_nonnull": 3025,
+        "n_nonnull": 3064,
         "mean": 0.053,
         "median": 0.049,
         "min": 0.0,
@@ -71,38 +71,38 @@
     "capacity_vars": {
       "ngo_per_10k": {
         "description": "registered nonprofits per 10k residents (ordered, truncated ~1M-row NGO extract)",
-        "n_nonnull": 3027,
-        "mean": 35.76,
-        "median": 26.105,
-        "min": 5.024,
-        "max": 379.747
+        "n_nonnull": 3066,
+        "mean": 131.664,
+        "median": 114.472,
+        "min": 24.501,
+        "max": 1632.562
       },
       "food_ngo_per_10k": {
         "description": "'Food, Agriculture and Nutrition' nonprofits per 10k residents",
-        "n_nonnull": 3027,
-        "mean": 0.631,
-        "median": 0.176,
+        "n_nonnull": 3066,
+        "mean": 3.047,
+        "median": 1.861,
         "min": 0.0,
-        "max": 42.194
+        "max": 45.351
       },
       "revenue_per_capita": {
         "description": "990/990EZ/990PF-filer total revenue per capita, $ (sparse ~3.6% filer match; NaN where no filer)",
-        "n_nonnull": 2221,
-        "mean": 73.355,
-        "median": 17.677,
-        "min": -30.559,
-        "max": 4281.599
+        "n_nonnull": 2941,
+        "mean": 341.491,
+        "median": 103.464,
+        "min": -917.392,
+        "max": 31079.259
       },
       "assets_per_capita": {
         "description": "990/990EZ/990PF-filer net assets per capita, $ (sparse ~3.6% filer match; NaN where no filer)",
-        "n_nonnull": 2219,
-        "mean": 143.508,
-        "median": 29.035,
-        "min": -1280.017,
-        "max": 16961.798
+        "n_nonnull": 2941,
+        "mean": 642.621,
+        "median": 203.097,
+        "min": -253.464,
+        "max": 102389.287
       }
     },
-    "n_counties": 3027
+    "n_counties": 3066
   },
   "proposal": {
     "candidates": [
@@ -151,9 +151,9 @@
     ],
     "gate_review": {
       "verdict": "proceed_with_warning",
-      "rationale": "All need-side tables and joins are usable, so the panel's denominators are sound. The capacity-side auto-drop of Florida and Connecticut is logged and non-fatal, but the panel is not nationally exhaustive, which any national claim must disclose."
+      "rationale": "Need-side tables and joins are all usable, so the panel's denominators are sound. On the full 3,420,024-row table the capacity-side drop is now almost entirely Florida and Connecticut, whose counties are unmappable in the committed lookup; that absence is logged, non-fatal, and must stay disclosed in any national claim."
     },
-    "narrative_notes": "Frame the gap score as a triage map, not a performance ranking: high-gap counties are places worth investigating, not evidence that local nonprofits underperform. Lead with the geography of the top-gap counties, then use the correlation grid to show that capacity tracks wealth rather than need. Flag the sparse 990 join and the sampled NGO table wherever financial metrics appear, and keep Florida and Connecticut's absence visible in every county count.",
+    "narrative_notes": "Frame the gap score as a triage map, not a performance ranking: high-gap counties are places worth investigating, not evidence that local nonprofits underperform. Lead with the geography of the top-gap counties, then use the correlation grid to show that capacity tracks wealth rather than need. Note that the analysis now runs on the full table rather than the truncated extract, with Virginia's independent cities recovered by the exact-first crosswalk. Flag the sparse 990 filer join wherever financial metrics appear, and keep Florida and Connecticut's lookup-driven absence visible in every county count.",
     "validation": {
       "n_raw": 7,
       "n_valid": 7,

@@ -1,7 +1,7 @@
 {
   "tables": {
     "ngos": {
-      "rows": 1048575,
+      "rows": 3420024,
       "columns": [
         "ein",
         "name",
@@ -34,7 +34,7 @@
         "state": 0.0,
         "zip": 0.0,
         "county": 0.0,
-        "ntee_code": 0.0068,
+        "ntee_code": 0.0165,
         "category": 0.0,
         "is_category_llm_generated": 1.0
       },
@@ -376,26 +376,31 @@
       "name": "ngo_county_to_fips",
       "side": "capacity",
       "kind": "join",
-      "match_rate": 0.9462,
-      "matched": 992202,
-      "unmatched": 56373,
+      "match_rate": 0.9322,
+      "matched": 3188097,
+      "unmatched": 231927,
       "verdict": "usable",
       "detail": {
-        "total_rows": 1048575,
-        "matched_rows": 992202,
-        "unmatched_rows": 56373,
-        "match_rate": 0.9462,
+        "total_rows": 3420024,
+        "matched_rows": 3188097,
+        "unmatched_rows": 231927,
+        "match_rate": 0.9322,
         "top_unmatched_states": {
-          "FL": 38915,
-          "CT": 11352,
-          "VA": 5291,
-          "NM": 300,
-          "CA": 82,
-          "OH": 69,
-          "NY": 44,
-          "IL": 26,
-          "NJ": 22,
-          "ME": 19
+          "FL": 188675,
+          "CT": 41739,
+          "CA": 205,
+          "OH": 88,
+          "TX": 80,
+          "IL": 77,
+          "AK": 75,
+          "NY": 72,
+          "AR": 68,
+          "WA": 64
+        },
+        "by_stage": {
+          "exact": 56694,
+          "normalized": 3131403,
+          "unmatched": 231927
         }
       }
     },
@@ -403,12 +408,12 @@
       "name": "ngo_to_f9_financials",
       "side": "capacity",
       "kind": "enrichment",
-      "match_rate": 0.0359,
-      "matched": 35647,
-      "unmatched": 956555,
+      "match_rate": 0.0373,
+      "matched": 118919,
+      "unmatched": 3069178,
       "verdict": "enrichment",
       "detail": {
-        "resolved_ngos": 992202,
+        "resolved_ngos": 3188097,
         "f9_unique_eins": 131027,
         "note": "990/990EZ/990PF summary filings; NaN financials where unmatched"
       }
@@ -443,87 +448,92 @@
   "gate": {
     "verdict": "proceed_with_warning",
     "reasons": [
-      "capacity-side join 'ngo_county_to_fips' match_rate=0.9462 (usable) -> auto-drop unmatched (56373 rows); top states: {'FL': 38915, 'CT': 11352, 'VA': 5291, 'NM': 300, 'CA': 82, 'OH': 69, 'NY': 44, 'IL': 26, 'NJ': 22, 'ME': 19}",
-      "enrichment join 'ngo_to_f9_financials' coverage=0.0359 -- 956555 rows keep NaN attributes (kept, not dropped)"
+      "capacity-side join 'ngo_county_to_fips' match_rate=0.9322 (usable) -> auto-drop unmatched (231927 rows); top states: {'FL': 188675, 'CT': 41739, 'CA': 205, 'OH': 88, 'TX': 80, 'IL': 77, 'AK': 75, 'NY': 72, 'AR': 68, 'WA': 64}",
+      "enrichment join 'ngo_to_f9_financials' coverage=0.0373 -- 3069178 rows keep NaN attributes (kept, not dropped)"
     ]
+  },
+  "ngo_source": {
+    "mode": "full_parts",
+    "files": 4,
+    "rows": 3420024
   },
   "panel": {
     "summary": {
-      "capacity_counties": 3029,
+      "capacity_counties": 3068,
       "need_counties": 3142,
-      "joined_counties": 3027,
+      "joined_counties": 3066,
       "capacity_only": 2,
-      "need_only": 115
+      "need_only": 76
     },
     "stats": {
       "need_score": {
-        "mean": 0.0038,
-        "median": -0.0227,
-        "std": 0.5975
+        "mean": 0.007,
+        "median": -0.023,
+        "std": 0.605
       },
       "capacity_score": {
-        "mean": -0.0058,
-        "median": -0.1387,
-        "std": 0.9018
+        "mean": 0.0141,
+        "median": 0.0166,
+        "std": 0.8265
       },
       "gap_score": {
-        "mean": 0.0096,
-        "median": 0.1145,
-        "std": 1.1733
+        "mean": -0.007,
+        "median": -0.0147,
+        "std": 1.0934
       },
       "food_capacity_score": {
         "mean": 0.0,
-        "median": -0.3846,
+        "median": -0.1908,
         "std": 1.0002
       },
       "food_gap_score": {
-        "mean": 0.0038,
-        "median": 0.2691,
-        "std": 1.2143
+        "mean": 0.007,
+        "median": 0.1442,
+        "std": 1.2565
       }
     },
     "top_gap_counties": [
       {
-        "county_fips": "05077",
-        "gap_score": 5.0334325281234715
-      },
-      {
         "county_fips": "48505",
-        "gap_score": 4.462976870459279
+        "gap_score": 4.1660589557206675
       },
       {
         "county_fips": "48507",
-        "gap_score": 3.841897230263614
+        "gap_score": 4.130633987219984
       },
       {
-        "county_fips": "28011",
-        "gap_score": 3.6959649283524802
+        "county_fips": "21159",
+        "gap_score": 3.837004645359963
       },
       {
-        "county_fips": "13271",
-        "gap_score": 3.3571057037338683
+        "county_fips": "05077",
+        "gap_score": 3.614887593364461
       },
       {
-        "county_fips": "48489",
-        "gap_score": 3.222170890210414
+        "county_fips": "05123",
+        "gap_score": 3.452718579080825
       },
       {
-        "county_fips": "28157",
-        "gap_score": 3.158761364062766
+        "county_fips": "01011",
+        "gap_score": 3.301845578279706
       },
       {
-        "county_fips": "48247",
-        "gap_score": 3.1560704380137867
+        "county_fips": "48427",
+        "gap_score": 3.211278012633612
       },
       {
-        "county_fips": "13101",
-        "gap_score": 3.118332085401054
+        "county_fips": "40023",
+        "gap_score": 3.2070133869936175
       },
       {
-        "county_fips": "13141",
-        "gap_score": 3.066701505551941
+        "county_fips": "51685",
+        "gap_score": 3.1549485617257385
+      },
+      {
+        "county_fips": "35047",
+        "gap_score": 3.1317943137339395
       }
     ],
-    "rows": 3027
+    "rows": 3066
   }
 }

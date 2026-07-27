@@ -1,0 +1,9 @@
+{
+  "panel_counties": 3066,
+  "counties_drawn": 3064,
+  "missing_geometry_fips": [
+    "02158",
+    "46102"
+  ],
+  "no_data_counties": 157
+}

@@ -5,7 +5,7 @@
       "name": "panel_fips",
       "passed": true,
       "detail": {
-        "rows": 3027,
+        "rows": 3066,
         "unique": true,
         "malformed": 0,
         "unknown_prefixes": []
@@ -37,10 +37,10 @@
       "name": "score_reproduction",
       "passed": true,
       "detail": {
-        "need_score": 6.661338147750939e-16,
+        "need_score": 8.881784197001252e-16,
         "capacity_score": 4.440892098500626e-16,
         "gap_score": 8.881784197001252e-16,
-        "food_gap_score": 8.881784197001252e-16
+        "food_gap_score": 1.1102230246251565e-15
       }
     },
     {
@@ -53,22 +53,60 @@
       }
     },
     {
+      "name": "crosswalk_recovery",
+      "passed": true,
+      "detail": {
+        "va_cities_expected": 34,
+        "va_cities_missing": [],
+        "dona_ana_present": true,
+        "va_collision_pairs": [
+          {
+            "stem": "fairfax",
+            "independent_city": "fairfax city",
+            "city_fips": "51600",
+            "county": "fairfax",
+            "county_fips": "51059"
+          },
+          {
+            "stem": "franklin",
+            "independent_city": "franklin city",
+            "city_fips": "51620",
+            "county": "franklin",
+            "county_fips": "51067"
+          },
+          {
+            "stem": "richmond",
+            "independent_city": "richmond city",
+            "city_fips": "51760",
+            "county": "richmond",
+            "county_fips": "51159"
+          },
+          {
+            "stem": "roanoke",
+            "independent_city": "roanoke city",
+            "city_fips": "51770",
+            "county": "roanoke",
+            "county_fips": "51161"
+          }
+        ]
+      }
+    },
+    {
       "name": "county_accounting",
       "passed": true,
       "detail": {
         "profiler_summary": {
-          "capacity_counties": 3029,
+          "capacity_counties": 3068,
           "need_counties": 3142,
-          "joined_counties": 3027,
+          "joined_counties": 3066,
           "capacity_only": 2,
-          "need_only": 115
+          "need_only": 76
         },
-        "need_only_total": 115,
+        "need_only_total": 76,
         "need_only_by_state": {
           "AK": {
-            "n": 2,
+            "n": 1,
             "fips": [
-              "02013",
               "02261"
             ]
           },
@@ -156,69 +194,6 @@
               "12131",
               "12133"
             ]
-          },
-          "HI": {
-            "n": 1,
-            "fips": [
-              "15005"
-            ]
-          },
-          "ND": {
-            "n": 1,
-            "fips": [
-              "38087"
-            ]
-          },
-          "NM": {
-            "n": 1,
-            "fips": [
-              "35013"
-            ]
-          },
-          "TX": {
-            "n": 1,
-            "fips": [
-              "48301"
-            ]
-          },
-          "VA": {
-            "n": 34,
-            "fips": [
-              "51510",
-              "51520",
-              "51530",
-              "51540",
-              "51550",
-              "51570",
-              "51580",
-              "51590",
-              "51595",
-              "51610",
-              "51630",
-              "51640",
-              "51650",
-              "51660",
-              "51670",
-              "51678",
-              "51680",
-              "51683",
-              "51685",
-              "51690",
-              "51700",
-              "51710",
-              "51720",
-              "51730",
-              "51735",
-              "51740",
-              "51750",
-              "51775",
-              "51790",
-              "51800",
-              "51810",
-              "51820",
-              "51830",
-              "51840"
-            ]
           }
         }
       }
@@ -240,9 +215,9 @@
         "proposed": 7,
         "with_verdict": 7,
         "verdicts": {
-          "supported": 3,
+          "supported": 4,
           "weak_direction": 2,
-          "unsupported": 2
+          "unsupported": 1
         }
       }
     },
@@ -250,7 +225,7 @@
       "name": "direction:gap~poverty_rate",
       "passed": true,
       "detail": {
-        "spearman_rho": 0.5315,
+        "spearman_rho": 0.5618,
         "expected": "positive"
       }
     },
@@ -258,18 +233,47 @@
       "name": "direction:gap~ngo_per_10k",
       "passed": true,
       "detail": {
-        "spearman_rho": -0.7559,
+        "spearman_rho": -0.5884,
         "expected": "negative"
+      }
+    },
+    {
+      "name": "fe_reproduction",
+      "passed": true,
+      "detail": {
+        "mismatched_fields": [],
+        "headline_slope": 0.132154,
+        "headline_p": 4.209949774074031e-09,
+        "headline_survives_fe": true
+      }
+    },
+    {
+      "name": "choropleth_meta",
+      "passed": true,
+      "detail": {
+        "panel_counties": 3066,
+        "counties_drawn": 3064,
+        "missing_geometry_fips": [
+          "02158",
+          "46102"
+        ],
+        "no_data_counties": 157,
+        "figures_present": [
+          "gap_score_choropleth_county.png",
+          "food_gap_score_choropleth_county.png"
+        ]
       }
     },
     {
       "name": "ngo_extract",
       "passed": true,
       "detail": {
-        "rows": 1048575,
-        "unique_eins": 1048575,
+        "mode": "full_parts",
+        "rows": 3420024,
+        "unique_eins": 3420024,
         "lexicographically_sorted": true,
-        "interpretation": "ordered, truncated extract (Excel row limit); NOT a random sample of the 3,420,024-row source"
+        "food_category_count": 40086,
+        "interpretation": "full 3,420,024-row NGOs_with_categories source (4 committed parts); closes the truncated-extract gap flagged in CP2/CP3 feedback"
       }
     },
     {
@@ -290,8 +294,32 @@
           "990": 58513,
           "990PF": 87
         },
-        "ngo_to_f9_matched": 37622,
-        "ngo_to_f9_coverage": 0.0359
+        "ngo_to_f9_matched": 127477,
+        "ngo_to_f9_coverage": 0.0373
+      }
+    },
+    {
+      "name": "truncation_analysis",
+      "passed": true,
+      "detail": {
+        "extract_rows": 1048575,
+        "full_rows": 3420024,
+        "overall_coverage": 0.3066,
+        "food_coverage": 0.2621,
+        "worst_covered": [
+          {
+            "state": "AK",
+            "coverage": 0.1611
+          },
+          {
+            "state": "HI",
+            "coverage": 0.1787
+          },
+          {
+            "state": "UT",
+            "coverage": 0.1794
+          }
+        ]
       }
     }
   ]

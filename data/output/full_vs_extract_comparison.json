@@ -1,0 +1,157 @@
+{
+  "panels": {
+    "A_cp3_extract_crosswalk_v1": {
+      "git_ref": "3a2e792",
+      "counties": 3027,
+      "gap_median": 0.115,
+      "gap_std": 1.173,
+      "gap_min": -4.38,
+      "gap_max": 5.033,
+      "top10_gap_fips": [
+        "05077",
+        "48505",
+        "48507",
+        "28011",
+        "13271",
+        "48489",
+        "28157",
+        "48247",
+        "13101",
+        "13141"
+      ]
+    },
+    "B_extract_crosswalk_v2": {
+      "counties": 3062,
+      "gap_median": 0.118,
+      "gap_std": 1.178,
+      "gap_min": -4.392,
+      "gap_max": 5.025,
+      "top10_gap_fips": [
+        "05077",
+        "48505",
+        "48507",
+        "28011",
+        "13271",
+        "48489",
+        "28157",
+        "48247",
+        "13101",
+        "13141"
+      ]
+    },
+    "C_full_crosswalk_v2": {
+      "counties": 3066,
+      "gap_median": -0.015,
+      "gap_std": 1.093,
+      "gap_min": -4.557,
+      "gap_max": 4.166,
+      "top10_gap_fips": [
+        "48505",
+        "48507",
+        "21159",
+        "05077",
+        "05123",
+        "01011",
+        "48427",
+        "40023",
+        "51685",
+        "35047"
+      ]
+    }
+  },
+  "A_vs_C": {
+    "common_counties": 3027,
+    "counties_gained_by_full": 39,
+    "gap_rank_rho_on_common": 0.733,
+    "top10_overlap_with_full": 3,
+    "corr_grid_max_abs_delta": 0.3653,
+    "corr_grid_mean_abs_delta": 0.0803,
+    "corr_sign_flips": [
+      {
+        "pair": "med_household_income ~ food_ngo_per_10k",
+        "this": 0.137,
+        "full": -0.061
+      },
+      {
+        "pair": "avg_housing_burden ~ food_ngo_per_10k",
+        "this": 0.107,
+        "full": -0.258
+      },
+      {
+        "pair": "avg_housing_burden ~ revenue_per_capita",
+        "this": -0.018,
+        "full": 0.006
+      }
+    ]
+  },
+  "B_vs_C": {
+    "common_counties": 3062,
+    "counties_gained_by_full": 4,
+    "gap_rank_rho_on_common": 0.7354,
+    "top10_overlap_with_full": 3,
+    "corr_grid_max_abs_delta": 0.3571,
+    "corr_grid_mean_abs_delta": 0.0804,
+    "corr_sign_flips": [
+      {
+        "pair": "med_household_income ~ food_ngo_per_10k",
+        "this": 0.139,
+        "full": -0.061
+      },
+      {
+        "pair": "avg_housing_burden ~ food_ngo_per_10k",
+        "this": 0.099,
+        "full": -0.258
+      },
+      {
+        "pair": "avg_housing_burden ~ revenue_per_capita",
+        "this": -0.021,
+        "full": 0.006
+      }
+    ]
+  },
+  "critic_verdicts_cp3_to_final": [
+    {
+      "pair": "unemployment ~ ngo_per_10k",
+      "cp3": "supported",
+      "final": "supported",
+      "changed": false
+    },
+    {
+      "pair": "med_household_income ~ revenue_per_capita",
+      "cp3": "supported",
+      "final": "supported",
+      "changed": false
+    },
+    {
+      "pair": "poverty_rate ~ revenue_per_capita",
+      "cp3": "supported",
+      "final": "supported",
+      "changed": false
+    },
+    {
+      "pair": "poverty_rate ~ ngo_per_10k",
+      "cp3": "weak_direction",
+      "final": "weak_direction",
+      "changed": false
+    },
+    {
+      "pair": "avg_food_desert_pct ~ food_ngo_per_10k",
+      "cp3": "weak_direction",
+      "final": "weak_direction",
+      "changed": false
+    },
+    {
+      "pair": "avg_housing_burden ~ assets_per_capita",
+      "cp3": "unsupported",
+      "final": "unsupported",
+      "changed": false
+    },
+    {
+      "pair": "dac_tract_pct ~ food_ngo_per_10k",
+      "cp3": "unsupported",
+      "final": "supported",
+      "changed": true
+    }
+  ],
+  "attribution_note": "A->B isolates the crosswalk fix (34 VA cities + Dona Ana); B->C isolates the move from the truncated extract to the full 3,420,024-row table."
+}
