@@ -45,7 +45,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from load_data import DataLoader  # noqa: E402
-from crosswalk import build_lookup_index, normalize_county_name, zero_pad_fips  # noqa: E402
+from crosswalk import (  # noqa: E402
+    build_lookup_index, fold_name, va_collision_pairs, zero_pad_fips,
+)
 from join_logic import score_panel  # noqa: E402
 from correlation_agent import NEED_VARS, CAPACITY_VARS  # noqa: E402
 
@@ -115,20 +117,60 @@ def verify_panel(v: Verifier, panel: pd.DataFrame) -> None:
     v.check("score_reproduction", all(e < 1e-9 for e in errs.values()), errs)
 
 
+# The 34 VA independent cities that were need-only (dropped) through CP3 and
+# must now be present in the panel, plus Dona Ana NM (mojibake-repaired).
+VA_RECOVERED_CITIES = [
+    "51510", "51520", "51530", "51540", "51550", "51570", "51580", "51590",
+    "51595", "51610", "51630", "51640", "51650", "51660", "51670", "51678",
+    "51680", "51683", "51685", "51690", "51700", "51710", "51720", "51730",
+    "51735", "51740", "51750", "51775", "51790", "51800", "51810", "51820",
+    "51830", "51840",
+]
+NM_RECOVERED = "35013"
+
+
 def verify_crosswalk(v: Verifier, lookup: pd.DataFrame) -> None:
+    # The exact-stage index is fold-only (no suffix stripping); ambiguity there
+    # would make resolution order-dependent, so it must be empty. The index
+    # builder raises on true collisions; surface that as a failed check rather
+    # than a crash.
     df = lookup.copy()
     df["_key"] = list(zip(df["state"].astype("string").str.strip().str.upper(),
-                          df["county_name"].map(normalize_county_name)))
+                          df["county_name"].map(fold_name)))
     dupe_keys = df[df.duplicated("_key", keep=False)]
     collisions = {
         str(k): sorted(zero_pad_fips(g["county_fips"]))
         for k, g in dupe_keys.groupby("_key")
         if g["county_fips"].nunique() > 1
     }
-    index = build_lookup_index(lookup)
-    v.check("crosswalk_collisions", len(collisions) == 0,
-            {"lookup_rows": int(len(lookup)), "index_keys": len(index),
+    try:
+        index = build_lookup_index(lookup)
+        n_keys = len(index)
+    except ValueError as e:
+        index, n_keys = None, 0
+        collisions.setdefault("builder_error", []).append(str(e))
+    v.check("crosswalk_collisions", index is not None and len(collisions) == 0,
+            {"lookup_rows": int(len(lookup)), "index_keys": n_keys,
              "colliding_keys": collisions})
+
+
+def verify_crosswalk_recovery(v: Verifier, panel: pd.DataFrame,
+                              lookup: pd.DataFrame) -> None:
+    """The final-checkpoint crosswalk fix, machine-checked: every previously
+    dropped VA independent city and Dona Ana NM is in the panel, and the
+    exact-first stage keeps the VA city/county same-stem pairs apart."""
+    panel_fips = set(panel["county_fips"].astype(str))
+    missing_va = sorted(set(VA_RECOVERED_CITIES) - panel_fips)
+    pairs = va_collision_pairs(lookup)
+    pairs_distinct = all(p["city_fips"] != p["county_fips"] for p in pairs)
+    expected_stems = {"fairfax", "franklin", "richmond", "roanoke"}
+    v.check("crosswalk_recovery",
+            not missing_va and NM_RECOVERED in panel_fips
+            and pairs_distinct and {p["stem"] for p in pairs} == expected_stems,
+            {"va_cities_expected": len(VA_RECOVERED_CITIES),
+             "va_cities_missing": missing_va,
+             "dona_ana_present": NM_RECOVERED in panel_fips,
+             "va_collision_pairs": pairs})
 
 
 def verify_county_accounting(v: Verifier, panel: pd.DataFrame,
@@ -241,6 +283,7 @@ def main(argv=None) -> int:
     v = Verifier()
     verify_panel(v, panel)
     verify_crosswalk(v, lookup)
+    verify_crosswalk_recovery(v, panel, lookup)
     verify_county_accounting(v, panel, profiler_log, lookup, need_fips)
     verify_correlations(v, corrs, panel)
     if args.skip_raw:
