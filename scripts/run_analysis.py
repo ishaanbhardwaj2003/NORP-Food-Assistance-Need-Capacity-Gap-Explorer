@@ -11,8 +11,10 @@ and findings summary on top of the committed Checkpoint 2 panel.
     4. Merge: mark LLM-proposed pairs, check hypothesized vs measured signs
     5. Critic: BH FDR across the grid + fixed-seed state-stratified permutation
        test per proposed pair -> supported / weak_direction / unsupported
-    6. Render figures -> <output-dir>/figures/
-    7. Write <output-dir>/findings_summary.md from the computed tables
+    6. State fixed-effects estimates (signed-log outcomes, cluster-robust SEs)
+       -> <output-dir>/fixed_effects_results.json
+    7. Render figures -> <output-dir>/figures/
+    8. Write <output-dir>/findings_summary.md from the computed tables
 
 Flags:
     --live         call the Anthropic API and refresh the cached LLM artifact
@@ -48,6 +50,7 @@ from correlation_agent import (  # noqa: E402
 from statistical_critic import (  # noqa: E402
     ALPHA, EFFECT_FLOOR, N_PERMUTATIONS, apply_critic, summarize_verdicts,
 )
+from fixed_effects import run_all as run_fixed_effects  # noqa: E402
 from make_plots import make_all_plots  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
@@ -97,8 +100,56 @@ def _gap_rank_comparison(panel: pd.DataFrame) -> dict:
     return {"rank_rho": rho, "top10_overlap": len(top_general & top_food)}
 
 
+def _fe_section(fe_report: dict | None) -> str:
+    """Markdown block for the state fixed-effects estimates (empty if absent)."""
+    if not fe_report:
+        return ""
+    head = fe_report["estimates"][0]
+    if "error" in head:
+        verdict_line = f"Headline estimate unavailable: {head['error']}."
+    else:
+        direction = "higher" if head["fe_slope"] > 0 else "lower"
+        verdict_line = (
+            f"Within states, counties with higher median household income have "
+            f"{direction} signed-log filer revenue per capita "
+            f"(slope {head['fe_slope']:+.4f} per $10k, cluster-robust "
+            f"p = {head['fe_p_value']:.2g}, {head['n']:,} counties, "
+            f"{head['n_states']} states). The slope survives absorbing every "
+            f"state-level shift, consistent with the critic's stratified "
+            f"permutation result: the wealth-capacity association is a "
+            f"within-state relationship, not a compositional artifact.")
+    return f"""## State fixed-effects check (deterministic)
+
+The strongest surviving finding (capacity tracks wealth) is re-estimated with
+state fixed effects absorbed and cluster-robust (CR1) standard errors at the
+state level. Outcomes use the panel's signed-log scale so financial outliers
+cannot dominate the slope; a raw-scale sensitivity fit is reported alongside.
+Full numbers in `fixed_effects_results.json`.
+
+{_md_fe_table(fe_report)}
+
+{verdict_line}
+
+"""
+
+
+def _md_fe_table(fe_report: dict) -> str:
+    lines = ["| Specification | FE slope | Cluster SE | p | Pooled slope | n | States |",
+             "|---|---|---|---|---|---|---|"]
+    for e in fe_report["estimates"]:
+        if "error" in e:
+            lines.append(f"| {e.get('label', '?')} | _{e['error']}_ | | | | {e['n']} | {e['n_states']} |")
+            continue
+        lines.append(
+            f"| {e['label']} | {e['fe_slope']:+.4f} | {e['fe_slope_cluster_se']:.4f} "
+            f"| {e['fe_p_value']:.2g} | {e['pooled_slope']:+.4f} | {e['n']:,} "
+            f"| {e['n_states']} |")
+    return "\n".join(lines)
+
+
 def write_findings_summary(panel: pd.DataFrame, corrs: pd.DataFrame,
-                           artifact: dict, gate: dict, summary_md: Path) -> Path:
+                           artifact: dict, gate: dict, summary_md: Path,
+                           fe_report: dict | None = None) -> Path:
     """Findings summary: every number below is computed by Python from the
     committed tables; the LLM contributes hypotheses and framing only."""
     gap = pd.to_numeric(panel["gap_score"], errors="coerce")
@@ -180,6 +231,7 @@ of which **{verdicts['n_supported']} supported**,
 
 {_md_critic_table(proposed) if len(proposed) else '_none proposed_'}
 
+{_fe_section(fe_report)}
 ## Quality-gate review
 
 - **Rule-based gate (authoritative):** `{gate['verdict']}` — {gate['reasons'][0] if gate.get('reasons') else ''}
@@ -273,7 +325,7 @@ def main(argv=None) -> int:
     print("[4/7] Evaluating LLM candidates against measured statistics ...")
     corrs = evaluate_candidates(corrs, proposal)
 
-    print("[5/7] Statistical critic (BH FDR + state-stratified permutations) ...")
+    print("[5/8] Statistical critic (BH FDR + state-stratified permutations) ...")
     corrs = apply_critic(corrs, panel)
     v = summarize_verdicts(corrs)
     print(f"      {v['n_sign_matched']}/{v['n_proposed']} signs matched -> "
@@ -283,15 +335,26 @@ def main(argv=None) -> int:
     corrs.to_csv(corr_csv, index=False)
     print(f"      -> {corr_csv}")
 
+    print("[6/8] State fixed-effects estimates (deterministic) ...")
+    fe_report = run_fixed_effects(panel)
+    fe_path = output_dir / "fixed_effects_results.json"
+    fe_path.write_text(json.dumps(fe_report, indent=2))
+    head = fe_report["estimates"][0]
+    print(f"      {fe_report['headline_pair']}: slope {head.get('fe_slope')} "
+          f"(cluster p {head.get('fe_p_value'):.2g}) "
+          f"survives_fe={fe_report['headline_survives_state_fe']}")
+    print(f"      -> {fe_path}")
+
     if args.skip_plots:
-        print("[6/7] Skipping plots (--skip-plots)")
+        print("[7/8] Skipping plots (--skip-plots)")
     else:
-        print("[6/7] Rendering figures ...")
+        print("[7/8] Rendering figures ...")
         for p in make_all_plots(panel, corrs, figures_dir):
             print(f"      -> {p}")
 
-    print("[7/7] Writing findings summary ...")
-    path = write_findings_summary(panel, corrs, artifact, gate, summary_md)
+    print("[8/8] Writing findings summary ...")
+    path = write_findings_summary(panel, corrs, artifact, gate, summary_md,
+                                  fe_report)
     print(f"      -> {path}")
     return 0
 

@@ -226,6 +226,45 @@ def verify_correlations(v: Verifier, corrs: pd.DataFrame,
                  "expected": "positive" if want_positive else "negative"})
 
 
+def verify_fixed_effects(v: Verifier, panel: pd.DataFrame,
+                         output_dir: Path) -> None:
+    """Recompute the state-FE estimates from the committed panel and compare
+    them to the committed fixed_effects_results.json; the headline
+    wealth-capacity slope must be positive and survive FE absorption."""
+    from fixed_effects import run_all  # local import: keeps --skip-raw fast paths lean
+
+    fe_path = output_dir / "fixed_effects_results.json"
+    if not fe_path.exists():
+        v.check("fe_reproduction", False,
+                {"error": f"{fe_path} missing -- run scripts/run_analysis.py"})
+        return
+    committed = json.loads(fe_path.read_text())
+    recomputed = run_all(panel)
+
+    def _fields_differ(val, wval) -> bool:
+        if isinstance(val, float) and isinstance(wval, (int, float)):
+            both_nan = np.isnan(val) and np.isnan(float(wval))
+            return not both_nan and abs(val - float(wval)) > 1e-9
+        return val != wval
+
+    mismatches = [
+        f"{got.get('label', '?')}::{key}"
+        for got, want in zip(recomputed["estimates"], committed.get("estimates", []))
+        for key, val in got.items()
+        if _fields_differ(val, want.get(key))
+    ]
+    head = recomputed["estimates"][0]
+    headline_ok = ("error" not in head and head["fe_slope"] > 0
+                   and head["survives_fe"] is True)
+    v.check("fe_reproduction",
+            not mismatches and headline_ok
+            and len(recomputed["estimates"]) == len(committed.get("estimates", [])),
+            {"mismatched_fields": mismatches[:12],
+             "headline_slope": head.get("fe_slope"),
+             "headline_p": head.get("fe_p_value"),
+             "headline_survives_fe": head.get("survives_fe")})
+
+
 def verify_raw_provenance(v: Verifier, loader: DataLoader) -> None:
     ngos = loader.load_ngos()
     eins = ngos["ein"].astype(str)
@@ -286,6 +325,7 @@ def main(argv=None) -> int:
     verify_crosswalk_recovery(v, panel, lookup)
     verify_county_accounting(v, panel, profiler_log, lookup, need_fips)
     verify_correlations(v, corrs, panel)
+    verify_fixed_effects(v, panel, output_dir)
     if args.skip_raw:
         print("  [skip] ngo_extract / f9_provenance (--skip-raw)")
     else:
