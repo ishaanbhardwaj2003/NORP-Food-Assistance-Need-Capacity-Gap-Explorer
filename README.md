@@ -228,7 +228,6 @@ scripts/
   analyze_truncation.py   # extract-vs-full truncation bias measurement
   compare_extract_vs_full.py  # which conclusions survive the full data
   regen_offline_cache.py  # rebuild the hash-bound LLM artifact (no key)
-  make_slides.py          # build the presentation deck from committed evidence
 tests/                    # 66 pytest tests (offline, no API key, no big files)
 data/
   raw/                    # committed inputs (incl. ngos_full/ parts)

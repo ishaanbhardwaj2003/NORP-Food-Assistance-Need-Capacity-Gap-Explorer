@@ -48,8 +48,8 @@ committed artifacts.
   against the current panel/gate with the same guardrails as a live call
   (honestly labeled offline authorship). The final artifact re-tests the same
   7 CP3 hypotheses so verdict changes are attributable to data, not prompts.
-- **`scripts/make_slides.py` + `presentation/`** — the final deck built from
-  committed evidence (python-pptx, presentation-only dependency).
+- **`presentation/`** — the final slide deck and narration script (the deck's
+  numbers were generated from the committed evidence artifacts).
 - **32 new pytest tests** (66 total): crosswalk v2 incl. the bare-lookup city
   case, loader source selection and header-casing robustness, FE estimator
   (incl. LSDV equivalence), map parsing/accounting.

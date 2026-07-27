@@ -37,3 +37,6 @@ CS6365_Checkpoint_Template.docx
 feedback.txt
 implementation_plan.md
 read-the-implementation-plan-refactored-crown.md
+
+# Presentation deck build script (the deck itself in presentation/ is committed)
+scripts/make_slides.py

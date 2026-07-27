@@ -184,7 +184,7 @@ New or reworked code this checkpoint:
 - `src/make_maps.py` + `data/reference/`: county choropleths and cartogram
   from committed geometry with provenance notes.
 - `scripts/analyze_truncation.py`, `scripts/compare_extract_vs_full.py`,
-  `scripts/regen_offline_cache.py`, `scripts/make_slides.py`.
+  `scripts/regen_offline_cache.py`.
 - `scripts/verify_outputs.py`: 13 to 17 checks.
 
 Committed evidence (all in `data/output/`): `joined_county_panel.csv` (3,066
