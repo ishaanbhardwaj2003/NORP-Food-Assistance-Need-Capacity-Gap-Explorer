@@ -148,9 +148,27 @@ def _md_fe_table(fe_report: dict) -> str:
     return "\n".join(lines)
 
 
+def _ngo_source_caveat(ngo_source: dict | None) -> str:
+    if ngo_source and ngo_source.get("mode") in ("full_parts", "full_single"):
+        return (
+            "- The panel is built from the **full 3,420,024-row** "
+            "NGOs_with_categories table (committed as "
+            f"{ngo_source.get('files', 4)} gzipped parts in "
+            "`data/raw/ngos_full/`), closing the truncated-extract gap flagged "
+            "at CP2/CP3. The old extract's bias is quantified in "
+            "`truncation_analysis.json`; conclusion changes are itemized in "
+            "`full_vs_extract_comparison.json`.")
+    return (
+        "- The NGO table is an **ordered, truncated extract**: 1,048,575 rows "
+        "(exactly the Excel export limit) of the 3,420,024-row source, "
+        "EIN-sorted and cut at an EIN prefix, so it is **not** a random "
+        "sample and national representativeness cannot be assumed.")
+
+
 def write_findings_summary(panel: pd.DataFrame, corrs: pd.DataFrame,
                            artifact: dict, gate: dict, summary_md: Path,
-                           fe_report: dict | None = None) -> Path:
+                           fe_report: dict | None = None,
+                           ngo_source: dict | None = None) -> Path:
     """Findings summary: every number below is computed by Python from the
     committed tables; the LLM contributes hypotheses and framing only."""
     gap = pd.to_numeric(panel["gap_score"], errors="coerce")
@@ -164,6 +182,8 @@ def write_findings_summary(panel: pd.DataFrame, corrs: pd.DataFrame,
     n_states = panel["county_fips"].str[:2].nunique()
     n_no_filer = int((pd.to_numeric(panel["matched_filer_count"],
                                     errors="coerce") == 0).sum())
+    n_no_poverty = int(pd.to_numeric(panel["poverty_rate"],
+                                     errors="coerce").isna().sum())
 
     top_rows = "\n".join(
         f"| {r.county_fips} | {r.county_name if pd.notna(r.county_name) else '—'}, "
@@ -244,16 +264,13 @@ of which **{verdicts['n_supported']} supported**,
 
 ## Caveats
 
-- The NGO table is an **ordered, truncated extract**: 1,048,575 rows (exactly
-  the Excel export limit) of the 3,420,024-row source, EIN-sorted and cut at
-  an EIN prefix, so it is **not** a random sample and national
-  representativeness cannot be assumed.
-- The financial join matches 990/990EZ/990PF summary filings for ~3.6% of
+{_ngo_source_caveat(ngo_source)}
+- The financial join matches 990/990EZ/990PF summary filings for ~4% of
   NGOs (median county filer coverage {coverage.median():.1%}).
   {n_no_filer} counties have **no matched filer**: their revenue/assets
   are reported as *missing* (NaN), never as zero, and their capacity score
   averages the remaining indicators (`capacity_component_count` records this).
-- 99 counties lack poverty data; `need_component_count` marks them.
+- {n_no_poverty} counties lack poverty data; `need_component_count` marks them.
 - Sources span vintages (2015–2019 tract indicators, 2022 filings, 2023
   poverty); `med_household_income` is an inverse-need/context measure.
 - The gap scores are **triage signals, not causal claims** about nonprofit
@@ -262,8 +279,9 @@ of which **{verdicts['n_supported']} supported**,
 ## Reproduce
 
 ```bash
-python scripts/run_pipeline.py --verbose   # rebuild the panel (~15 s)
+python scripts/run_pipeline.py --verbose   # rebuild the panel (full parts auto-detected)
 python scripts/run_analysis.py             # offline: replays the committed LLM cache
+python scripts/analyze_truncation.py       # extract-vs-full truncation bias
 python scripts/verify_outputs.py           # re-verify every claim above
 pytest -q                                  # unit tests (no API key, no big files)
 python scripts/run_analysis.py --live      # optional: refresh the LLM artifact (needs ANTHROPIC_API_KEY)
@@ -308,7 +326,9 @@ def main(argv=None) -> int:
 
     print("[1/7] Loading committed panel + county names ...")
     panel = load_panel(panel_csv)
-    gate = json.loads(profiler_log.read_text())["gate"]
+    prof = json.loads(profiler_log.read_text())
+    gate = prof["gate"]
+    ngo_source = prof.get("ngo_source")
     print(f"      panel: {panel.shape}   gate verdict: {gate['verdict']}")
 
     print("[2/7] Computing exhaustive need x capacity correlation grid (Python) ...")
@@ -357,7 +377,7 @@ def main(argv=None) -> int:
 
     print("[8/8] Writing findings summary ...")
     path = write_findings_summary(panel, corrs, artifact, gate, summary_md,
-                                  fe_report)
+                                  fe_report, ngo_source)
     print(f"      -> {path}")
     return 0
 
