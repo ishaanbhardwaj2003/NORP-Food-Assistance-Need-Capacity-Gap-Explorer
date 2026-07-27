@@ -3,6 +3,70 @@
 All notable changes to the NORP Food Assistance Need-Capacity Gap Explorer.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## Final checkpoint — full data, crosswalk v2, FE estimate, maps — 2026-07-26
+
+Closes the data-access gap the CP2 and CP3 feedback flagged, audits the TA's
+`ai-suggestions/cp4` benchmark branch the same way CP3 audited our own
+outputs, and ships the three deliverables named in the CP3 report plus the
+measurement layer around them. Every conclusion change is itemized in
+committed artifacts.
+
+### Added
+- **Full 3,420,024-row `NGOs_with_categories` table** committed as four
+  gzipped parts (`data/raw/ngos_full/`; GitHub's 100 MB cap forces the split),
+  with `scripts/assemble_ngo_parts.py` to validate/split a delivery and a
+  multi-part-aware `DataLoader` (`--ngo-source {auto,full,extract}`;
+  provenance recorded in `profiler_log.json`). Validation anchors: exact CP1
+  row count, unique EINs, food count 40,086 vs the CP1 ~40,080.
+- **Crosswalk v2** (`src/crosswalk.py`): exact-first resolution + one-suffix
+  fallback now including bare "city", plus text folding with a conservative
+  encoding-repair rule (the lookup itself stores "DoÃ±a Ana"). Recovers all
+  34 VA independent cities and Doña Ana NM; the TA benchmark's version
+  recovered zero rows on the real data (verified; its fixtures only tested
+  lookup-verbatim names). Its exact-first concept and `va_collision_pairs`
+  audit are adopted with credit.
+- **`src/fixed_effects.py`** — state-FE OLS of the wealth-capacity headline
+  with CR1 cluster-robust SEs (estimator core adapted from the benchmark),
+  moved onto the panel's signed-log scale with a raw-scale sensitivity fit;
+  wired into `run_analysis.py`, `findings_summary.md`, and a
+  `fe_reproduction` verifier check. Headline survives: slope +0.132 per $10k,
+  cluster p = 4.2e-09.
+- **`src/make_maps.py`** — true county choropleths (general + food gap) in
+  pure matplotlib from committed public-domain geometry
+  (`data/reference/us_counties_geo.json` + PROVENANCE), CONUS + AK/HI insets,
+  no-data grey for FL/CT, `choropleth_meta.json` accounting; the benchmark's
+  state tile cartogram kept as the overview figure.
+- **`scripts/analyze_truncation.py`** — the retired extract's bias, measured:
+  30.7% of rows but 26.2% of food NGOs and 16.1% of AK; per-state coverage
+  figure + JSON.
+- **`scripts/compare_extract_vs_full.py`** — CP3 panel vs extract+crosswalk-v2
+  vs full-data panel, isolating what the crosswalk fix changed vs what the
+  full data changed: 3,027 → 3,062 → 3,066 counties, top-10 overlap 3/10 vs
+  CP3, two food-sector correlation sign flips, and
+  `dac_tract_pct ~ food_ngo_per_10k` moving unsupported → supported.
+- **`scripts/regen_offline_cache.py`** — rebuilds the hash-bound LLM artifact
+  against the current panel/gate with the same guardrails as a live call
+  (honestly labeled offline authorship). The final artifact re-tests the same
+  7 CP3 hypotheses so verdict changes are attributable to data, not prompts.
+- **`scripts/make_slides.py` + `presentation/`** — the final deck built from
+  committed evidence (python-pptx, presentation-only dependency).
+- **32 new pytest tests** (66 total): crosswalk v2 incl. the bare-lookup city
+  case, loader source selection and header-casing robustness, FE estimator
+  (incl. LSDV equivalence), map parsing/accounting.
+
+### Changed
+- Panel: 3,027 → **3,066 counties**; need-only losses 115 → 76 (now 99.3%
+  pure FL/CT lookup gaps). No-filer counties 803 → 124. Critic verdicts:
+  3/2/2 → **4 supported / 2 weak / 1 unsupported**. Top-gap geography holds
+  (Zapata TX, Zavala TX, Martin KY, Lee AR, St. Francis AR); recovered
+  Manassas Park VA enters the top 10.
+- `verify_outputs.py`: 13 → **17 checks** (crosswalk_recovery,
+  fe_reproduction, choropleth_meta, truncation_analysis; ngo provenance is
+  source-aware).
+- `findings_summary.md` caveats are source-aware; poverty-missing and
+  no-filer counts computed from the panel instead of frozen.
+- Commit author identity switched to the address registered with GitHub.
+
 ## Checkpoint 3 revision — data validity + statistical critic — 2026-07-15
 
 A validity-first revision responding to the Checkpoint 2 TA feedback ("commit
