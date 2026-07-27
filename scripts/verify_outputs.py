@@ -341,6 +341,33 @@ def verify_raw_provenance(v: Verifier, loader: DataLoader) -> None:
             detail)
 
 
+def verify_truncation_analysis(v: Verifier, output_dir: Path) -> None:
+    """Re-derive the truncation analysis' headline numbers (extract side
+    recomputed from the committed raw file; full side against the known
+    anchors) and compare them to the committed JSON."""
+    path = output_dir / "truncation_analysis.json"
+    if not path.exists():
+        v.check("truncation_analysis", False,
+                {"error": f"{path} missing -- run scripts/analyze_truncation.py"})
+        return
+    rep = json.loads(path.read_text())
+    extract = DataLoader(ngo_source="extract").load_ngos()
+    food_ex = int((extract["category"] == FOOD_LABEL).sum())
+    coverage_ok = (rep.get("overall_coverage")
+                   == round(rep.get("extract_rows", 0) / rep.get("full_rows", 1), 4))
+    v.check("truncation_analysis",
+            rep.get("extract_rows") == len(extract)
+            and rep.get("full_rows") == FULL_NGO_ROWS
+            and rep.get("food_category", {}).get("extract") == food_ex
+            and coverage_ok
+            and len(rep.get("worst_covered_states", [])) > 0,
+            {"extract_rows": rep.get("extract_rows"),
+             "full_rows": rep.get("full_rows"),
+             "overall_coverage": rep.get("overall_coverage"),
+             "food_coverage": rep.get("food_category", {}).get("coverage"),
+             "worst_covered": rep.get("worst_covered_states", [])[:3]})
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Verify committed pipeline outputs")
     ap.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
@@ -370,9 +397,10 @@ def main(argv=None) -> int:
     verify_fixed_effects(v, panel, output_dir)
     verify_choropleth(v, panel, output_dir)
     if args.skip_raw:
-        print("  [skip] ngo_extract / f9_provenance (--skip-raw)")
+        print("  [skip] ngo_extract / f9_provenance / truncation_analysis (--skip-raw)")
     else:
         verify_raw_provenance(v, loader)
+        verify_truncation_analysis(v, output_dir)
 
     n_pass = sum(c["passed"] for c in v.checks)
     if args.skip_raw:
