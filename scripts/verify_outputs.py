@@ -265,16 +265,34 @@ def verify_fixed_effects(v: Verifier, panel: pd.DataFrame,
              "headline_survives_fe": head.get("survives_fe")})
 
 
+FULL_NGO_ROWS = 3_420_024
+FOOD_LABEL = "Food, Agriculture and Nutrition"
+FOOD_ANCHOR = 40_080  # Checkpoint 1 Metabase verification (measured: 40,086)
+
+
 def verify_raw_provenance(v: Verifier, loader: DataLoader) -> None:
     ngos = loader.load_ngos()
     eins = ngos["ein"].astype(str)
-    v.check("ngo_extract",
-            len(ngos) == 1_048_575 and eins.is_unique
-            and bool(eins.is_monotonic_increasing),
-            {"rows": int(len(ngos)), "unique_eins": int(eins.nunique()),
-             "lexicographically_sorted": bool(eins.is_monotonic_increasing),
-             "interpretation": "ordered, truncated extract (Excel row limit); "
-                               "NOT a random sample of the 3,420,024-row source"})
+    mode = (loader.ngo_source or {}).get("mode", "extract")
+    detail = {"mode": mode, "rows": int(len(ngos)),
+              "unique_eins": int(eins.nunique()),
+              "lexicographically_sorted": bool(eins.is_monotonic_increasing)}
+    if mode == "extract":
+        detail["interpretation"] = (
+            "ordered, truncated extract (Excel row limit); NOT a random "
+            "sample of the 3,420,024-row source")
+        passed = (len(ngos) == 1_048_575 and eins.is_unique
+                  and bool(eins.is_monotonic_increasing))
+    else:
+        food = int((ngos["category"] == FOOD_LABEL).sum())
+        detail["food_category_count"] = food
+        detail["interpretation"] = (
+            "full 3,420,024-row NGOs_with_categories source "
+            f"({(loader.ngo_source or {}).get('files', '?')} committed parts); "
+            "closes the truncated-extract gap flagged in CP2/CP3 feedback")
+        passed = (len(ngos) == FULL_NGO_ROWS and eins.is_unique
+                  and abs(food - FOOD_ANCHOR) / FOOD_ANCHOR <= 0.01)
+    v.check("ngo_extract", passed, detail)
 
     f9 = loader.load_f9()
     ein = f9["org_ein"].dropna()

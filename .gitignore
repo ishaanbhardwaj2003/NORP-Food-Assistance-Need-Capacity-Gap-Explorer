@@ -12,6 +12,10 @@ CLAUDE.md
 # fetched into this repo as ai-suggestions/cp4 for auditability)
 TA-FEEDBACK-GOABOVEANDBEYOND/
 
+# The single-file full NGO export (~162 MB) exceeds GitHub's 100 MB cap; the
+# committed canonical form is the split parts in data/raw/ngos_full/.
+data/raw/NGOs_with_categories.csv.gz
+
 # Python
 __pycache__/
 *.pyc

@@ -117,6 +117,11 @@ def main(argv=None) -> int:
     ap.add_argument("--sample", action="store_true", help="10k rows/file")
     ap.add_argument("--mock", action="store_true", help="synthetic capacity/need tables")
     ap.add_argument("--verbose", action="store_true", help="detailed output")
+    ap.add_argument("--ngo-source", choices=["auto", "full", "extract"],
+                    default="auto",
+                    help="NGO table source: committed full parts / local full "
+                         "export ('full'), the truncated 1M-row extract "
+                         "('extract'), or prefer-full-if-present ('auto')")
     ap.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR),
                     help="output directory (use a scratch dir for smoke tests "
                          "so committed evidence is never overwritten)")
@@ -126,8 +131,11 @@ def main(argv=None) -> int:
     profiler_log = output_dir / "profiler_log.json"
     panel_csv = output_dir / "joined_county_panel.csv"
 
-    print(f"[1/7] Loading raw data (sample={args.sample}) ...")
-    frames = DataLoader(sample_mode=args.sample).load_all()
+    print(f"[1/7] Loading raw data (sample={args.sample}, "
+          f"ngo_source={args.ngo_source}) ...")
+    loader = DataLoader(sample_mode=args.sample, ngo_source=args.ngo_source)
+    frames = loader.load_all()
+    print(f"      NGO table source: {loader.ngo_source}")
     for name, df in frames.items():
         print(f"      {name:14s} {df.shape}")
 
@@ -158,8 +166,10 @@ def main(argv=None) -> int:
 
     print("[7/7] Saving outputs ...")
     builder.save(panel, panel_csv)
-    # Fold the join summary + scoring stats into the profiler log for evidence.
+    # Fold the join summary + scoring stats into the profiler log for evidence,
+    # along with which NGO source (full parts vs truncated extract) was read.
     log = json.loads(profiler_log.read_text())
+    log["ngo_source"] = loader.ngo_source
     log["panel"] = desc
     log["panel"]["rows"] = int(len(panel))
     profiler_log.write_text(json.dumps(log, indent=2))
