@@ -52,6 +52,7 @@ from statistical_critic import (  # noqa: E402
 )
 from fixed_effects import run_all as run_fixed_effects  # noqa: E402
 from make_plots import make_all_plots  # noqa: E402
+from make_maps import make_gap_maps  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
 
@@ -350,6 +351,8 @@ def main(argv=None) -> int:
     else:
         print("[7/8] Rendering figures ...")
         for p in make_all_plots(panel, corrs, figures_dir):
+            print(f"      -> {p}")
+        for p in make_gap_maps(panel, figures_dir):
             print(f"      -> {p}")
 
     print("[8/8] Writing findings summary ...")

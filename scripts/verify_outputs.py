@@ -265,6 +265,30 @@ def verify_fixed_effects(v: Verifier, panel: pd.DataFrame,
              "headline_survives_fe": head.get("survives_fe")})
 
 
+def verify_choropleth(v: Verifier, panel: pd.DataFrame,
+                      output_dir: Path) -> None:
+    """The county choropleths must exist and account for every panel county:
+    drawn + missing-geometry == panel rows, with only the two known post-2010
+    FIPS renames allowed to lack geometry."""
+    meta_path = output_dir / "figures" / "choropleth_meta.json"
+    figures = [output_dir / "figures" / f"{s}_choropleth_county.png"
+               for s in ("gap_score", "food_gap_score")]
+    if not meta_path.exists():
+        v.check("choropleth_meta", False,
+                {"error": f"{meta_path} missing -- run scripts/run_analysis.py"})
+        return
+    meta = json.loads(meta_path.read_text())
+    accounted = (meta.get("counties_drawn", 0)
+                 + len(meta.get("missing_geometry_fips", []))
+                 == meta.get("panel_counties", -1))
+    v.check("choropleth_meta",
+            all(f.exists() for f in figures)
+            and meta.get("panel_counties") == len(panel)
+            and meta.get("counties_drawn", 0) >= 3_000
+            and accounted,
+            {**meta, "figures_present": [f.name for f in figures if f.exists()]})
+
+
 FULL_NGO_ROWS = 3_420_024
 FOOD_LABEL = "Food, Agriculture and Nutrition"
 FOOD_ANCHOR = 40_080  # Checkpoint 1 Metabase verification (measured: 40,086)
@@ -344,6 +368,7 @@ def main(argv=None) -> int:
     verify_county_accounting(v, panel, profiler_log, lookup, need_fips)
     verify_correlations(v, corrs, panel)
     verify_fixed_effects(v, panel, output_dir)
+    verify_choropleth(v, panel, output_dir)
     if args.skip_raw:
         print("  [skip] ngo_extract / f9_provenance (--skip-raw)")
     else:
