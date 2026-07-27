@@ -28,3 +28,12 @@ venv/
 # The generated profiler_log.json and joined_county_panel.csv are committed to
 # main as self-contained Supporting Evidence that the pipeline runs end-to-end
 # (per Checkpoint 1 grading feedback).
+
+# Local working documents (reports, feedback, planning notes) stay out of the repo
+CP3_REVISION_NOTES.md
+CS6365_Checkpoint1_Report.pdf
+CS6365_Checkpoint2_Report.docx
+CS6365_Checkpoint_Template.docx
+feedback.txt
+implementation_plan.md
+read-the-implementation-plan-refactored-crown.md
