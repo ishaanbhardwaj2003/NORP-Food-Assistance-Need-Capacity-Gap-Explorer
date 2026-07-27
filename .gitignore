@@ -1,10 +1,16 @@
 # OS / editor cruft
 .DS_Store
 *.DS_Store
+~$*
+*.code-workspace
 
 # Local development notes (not part of the project deliverables)
 CLAUDE.md
 .claude/
+
+# Local clone of the TA benchmark branch (nested git repo; the branch itself is
+# fetched into this repo as ai-suggestions/cp4 for auditability)
+TA-FEEDBACK-GOABOVEANDBEYOND/
 
 # Python
 __pycache__/
