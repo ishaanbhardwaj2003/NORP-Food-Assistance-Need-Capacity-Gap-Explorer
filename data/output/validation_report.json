@@ -37,10 +37,10 @@
       "name": "score_reproduction",
       "passed": true,
       "detail": {
-        "need_score": 8.881784197001252e-16,
-        "capacity_score": 4.440892098500626e-16,
-        "gap_score": 8.881784197001252e-16,
-        "food_gap_score": 1.1102230246251565e-15
+        "need_score": 1.1102230246251565e-15,
+        "capacity_score": 8.881784197001252e-16,
+        "gap_score": 1.3322676295501878e-15,
+        "food_gap_score": 1.3322676295501878e-15
       }
     },
     {
@@ -243,7 +243,7 @@
       "detail": {
         "mismatched_fields": [],
         "headline_slope": 0.132154,
-        "headline_p": 4.209949774074031e-09,
+        "headline_p": 4.209949774074028e-09,
         "headline_survives_fe": true
       }
     },

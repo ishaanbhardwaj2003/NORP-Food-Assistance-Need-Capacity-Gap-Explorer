@@ -48,8 +48,10 @@ which we obtained in full this week, joined to about a hundred thirty
 thousand IRS 990 filings for revenue and assets. On the need side, seventy
 two thousand census tracts with food-desert shares, housing burden, and
 disadvantage scores, plus county poverty, income, and unemployment. Three
-hazards shaped the whole design. First, the capacity side names counties in
-text while the need side uses FIPS codes, and names lie. Second, only about
+hazards shaped the whole design. First, the capacity side identifies counties by text
+name while the need side uses numeric FIPS codes, and those names are an
+unreliable join key: spellings and suffixes vary, and the same name recurs
+across different states. Second, only about
 four percent of nonprofits have a matched filing, so financial data is
 sparse and has to be treated as missing, never as zero. And third, until
 this week we only had a truncated extract of the nonprofit table, cut at the
@@ -102,7 +104,7 @@ This is the answer to our research question: a triage list. The counties
 where food-related need most outpaces nonprofit capacity are Zapata and
 Zavala on the Texas border, Martin County in Appalachian Kentucky, Lee and
 St. Francis in the Arkansas Delta, Bullock in the Alabama Black Belt. These
-are exactly the places a domain expert would nod at, which matters, because
+are exactly the places a domain expert would expect to see, which matters, because
 face validity is the first check a triage signal has to pass. One newcomer:
 Manassas Park, Virginia, a small independent city our new crosswalk
 recovered. Small denominators can amplify a city like that, so we report it
@@ -110,7 +112,7 @@ with that caveat attached rather than filtering it away.
 
 ## Slide 8 - The map (Ishaan, ~40s)
 
-The same result as geography. Red is need outpacing capacity: the Delta, the
+This is the same result, expressed geographically. Red is need outpacing capacity: the Delta, the
 Texas border, the Black Belt, Appalachia. Blue is the Northeast and upper
 Midwest, where capacity outpaces need. The grey states are Florida and
 Connecticut, absent by an honest rule rather than silently missing. This is
